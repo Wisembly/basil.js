@@ -1,12 +1,16 @@
 (function () {
-	var Basil = window.Basil = {};
+	var Basil = window.Basil = function (options) {
+		return new window.Basil.Storage().init(options);
+	};
 
-	Basil.version = '0.1.23';
+	Basil.version = '0.1.24';
 
 	Basil.Storage = function () {
 		var _namespace = function () {
 				var options = this.options || {};
-				return (options.namespace || 'b45i1');
+				if (options.namespace === false || options.namespace === null)
+					return '';
+				return (options.namespace || 'b45i1') + ':';
 			},
 			_detect = function (type) {
 				var types = type ? [type] : ['local', 'cookie', 'sessions', 'memory'],
@@ -20,11 +24,11 @@
 				var key = '',
 					namespace = _namespace.call(this);
 				if (typeof name === 'string')
-					key = namespace + ':' + name;
+					key = namespace + name;
 				else if (name instanceof Array) {
 					for (var i = 0; i < name.length; i++)
 						if (name[i])
-							key += (key.length ? '' : namespace) + ':' + name[i];
+							key += (key.length ? ':' : namespace) + name[i];
 				}
 				return key;
 			},

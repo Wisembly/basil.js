@@ -2,6 +2,7 @@
 
 The missing Javascript smart persistant layer
 
+
 # Basic Usage
 
 ```javascript
@@ -17,6 +18,33 @@ basil.check('local'); // boolean. Test if localStorage is available
 basil.reset(); // reset all stored values under namespace for current storage
 ```
 
+
+# Advanced Usage
+
+```javascript
+basil = new window.Basil(options);
+
+// force storage on the go through basil
+// set 'bar' value under 'foo' key in localStorage
+basil.set('foo', 'bar', 'local');
+
+// Access native storages
+// With basil API, but without namespace nor JSON parsing for values
+
+// cookies
+basil.cookie.get(key);
+basil.cookie.set(key, value, days);
+
+// localStorage
+basil.localStorage.get(key);
+basil.localStorage.set(key, value);
+
+// sessionStorage
+basil.sessionStorage.get(key);
+basil.sessionStorage.set(key, value);
+```
+
+
 # Configuration
 
 Here is the whole `options` object that you could give to Basil:
@@ -24,7 +52,7 @@ Here is the whole `options` object that you could give to Basil:
 ```javascript
 options = {
   // Namespace. Namespace you Basil stored data
-  // default: 'b45i1', set `false` or `null` if you don't want namespace
+  // default: 'b45i1'
   namespace: 'foo',
 
   // Type. Specify a Basil supported storage
@@ -33,3 +61,8 @@ options = {
   type: 'cookie'
 };
 ```
+
+
+# License
+
+MIT. See `LICENSE.md`

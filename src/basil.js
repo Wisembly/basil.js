@@ -3,13 +3,11 @@
 		return new window.Basil.Storage().init(options);
 	};
 
-	Basil.version = '0.1.24';
+	Basil.version = '0.1.25';
 
 	Basil.Storage = function () {
 		var _namespace = function () {
 				var options = this.options || {};
-				if (options.namespace === false || options.namespace === null)
-					return '';
 				return (options.namespace || 'b45i1') + ':';
 			},
 			_detect = function (type) {
@@ -211,7 +209,11 @@
 				if (!this.check(type))
 					return;
 				_storages[type || this.type].reset();
-			}
+			},
+			// Access to native storages, without namespace or basil value decoration
+			cookie: _storages.cookie,
+			localStorage: _storages.local,
+			sessionStorage: _storages.session
 		};
 	};
 })();

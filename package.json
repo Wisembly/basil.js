@@ -1,0 +1,20 @@
+{
+    "name": "basil",
+    "version": "0.0.1",
+    "scripts": {
+        "test": "./node_modules/karma/bin/karma start test/karma.config.js"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "karma": "*",
+        "karma-mocha": "*",
+        "karma-sinon-expect": "*",
+        "karma-detect-browsers": "*",
+        "karma-chrome-launcher": "*",
+        "karma-firefox-launcher": "*",
+        "karma-safari-launcher": "*",
+        "karma-opera-launcher": "*",
+        "karma-ie-launcher": "*",
+        "karma-phantomjs-launcher": "*"
+    }
+}

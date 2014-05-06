@@ -66,7 +66,8 @@
 					},
 					reset: function () {
 						var namespace = _namespace.call(this);
-						for (var key in window.localStorage) {
+						for (var key, i = 0; i < window.localStorage.length; i++) {
+							key = window.localStorage.key(i);
 							if (key.indexOf(namespace) === 0)
 								this.remove(key);
 						}

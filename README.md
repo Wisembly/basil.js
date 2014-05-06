@@ -3,7 +3,7 @@
 The missing Javascript smart persistant layer
 
 
-# Basic Usage
+## Basic Usage
 
 ```javascript
 basil = new window.Basil(options);
@@ -19,7 +19,7 @@ basil.reset(); // reset all stored values under namespace for current storage
 ```
 
 
-# Advanced Usage
+## Advanced Usage
 
 ```javascript
 basil = new window.Basil(options);
@@ -45,7 +45,7 @@ basil.sessionStorage.set(key, value);
 ```
 
 
-# Configuration
+## Configuration
 
 Here is the whole `options` object that you could give to Basil:
 
@@ -62,7 +62,23 @@ options = {
 };
 ```
 
+## Build
 
-# License
+To generate the production files, make sure you already installed the dependencies using ````npm install```` and then just use:
+
+````
+npm run-script build
+````
+
+## Tests
+
+To launch the test suite, make sure you already installed the dependecies using ````npm-install````.
+Tests are launching in all your installed browsers. They're also launched on Travis CI, in PhantomJS.
+
+````
+npm test
+````
+
+## License
 
 MIT. See `LICENSE.md`

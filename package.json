@@ -2,7 +2,8 @@
     "name": "basil",
     "version": "0.0.1",
     "scripts": {
-        "test": "./node_modules/karma/bin/karma start test/karma.config.js"
+        "test": "./node_modules/karma/bin/karma start test/karma.config.js",
+        "build": "node_modules/gulp/bin/gulp.js"
     },
     "dependencies": {},
     "devDependencies": {
@@ -15,6 +16,9 @@
         "karma-safari-launcher": "*",
         "karma-opera-launcher": "*",
         "karma-ie-launcher": "*",
-        "karma-phantomjs-launcher": "*"
+        "karma-phantomjs-launcher": "*",
+        "gulp": "*",
+        "gulp-uglify": "*",
+        "gulp-rename": "*"
     }
 }

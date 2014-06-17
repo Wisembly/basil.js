@@ -3,20 +3,26 @@
 		return new window.Basil.Storage().init(options);
 	};
 
-	Basil.version = '0.1.25';
+	Basil.version = '0.2.02';
 
 	Basil.Storage = function () {
-		var _namespace = function () {
+		var _allStorages = ['local', 'cookie', 'sessions', 'memory'],
+			_namespace = function () {
 				var options = this.options || {};
 				return (options.namespace || 'b45i1') + ':';
 			},
-			_detect = function (type) {
-				var types = type ? [type] : ['local', 'cookie', 'sessions', 'memory'],
-					available = null;
-				for (var i = 0; !available && i < types.length; i++) {
-					available = this.check(types[i]) ? types[i] : null;
+			_detect = function (storages) {
+				storages = _toStoragesArray.call(this, storages) || _allStorages;
+				for (var i = 0; i < storages.length; i++) {
+					if (this.check(storages[i]))
+						return storages[i];
 				}
-				return available;
+				return null;
+			},
+			_toStoragesArray = function (storages) {
+				if (!storages)
+					return null;
+				return Object.prototype.toString.call(storages) === '[object Array]' ? storages : [storages];
 			},
 			_toStoredKey = function (name) {
 				var key = '',
@@ -47,7 +53,7 @@
 						}
 						return true;
 					},
-					set: function (name, value) {
+					set: function (name, value, options) {
 						if (!name)
 							return;
 						try {
@@ -83,7 +89,7 @@
 						}
 						return true;
 					},
-					set: function (name, value) {
+					set: function (name, value, options) {
 						if (!name)
 							return;
 						try {
@@ -113,7 +119,7 @@
 					check: function () {
 						return true;
 					},
-					set: function (name, value) {
+					set: function (name, value, options) {
 						if (!name)
 							return;
 						this._hash[name] = value;
@@ -136,16 +142,19 @@
 					check: function () {
 						return navigator.cookieEnabled;
 					},
-					set: function (name, value, days) {
+					set: function (name, value, options) {
 						if (!name)
 							return;
-						var expires = '';
-						if (days) {
+						options = options || {};
+						var cookie = name + '=' + value;
+						if (options.days) {
 							var date = new Date();
-							date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-							expires = '; expires=' + date.toGMTString();
+							date.setTime(date.getTime() + (options.days * 24 * 60 * 60 * 1000));
+							cookie += '; expires=' + date.toGMTString();
 						}
-						document.cookie = name + '=' + value + expires + '; path=/';
+						if (options.domain)
+							cookie += '; domain=' + options.domain;
+						document.cookie = cookie + '; path=/';
 					},
 					get: function (name) {
 						var cookies = document.cookie.split(';');
@@ -160,7 +169,14 @@
 					remove: function (name) {
 						if (!name)
 							return;
-						this.set(name, '', -1);
+						// remove cookie from main domain
+						this.set(name, '', { days: -1 });
+
+						// remove cookie from upper domains
+						var domainParts = document.domain.split('.');
+						for (var i = domainParts.length - 1; i > 0; i--) {
+							this.set(name, '', { days: -1, domain: '.' + domainParts.slice(- i).join('.') });
+						}
 					},
 					reset: function () {
 						var namespace = _namespace.call(this),
@@ -179,37 +195,66 @@
 		return {
 			init: function (options) {
 				this.options = options || {};
-				this.type = _detect.call(this, this.options.type);
+
+				this.allStorages = this.options.storages || _allStorages;
+				this.currentStorage = _detect.call(this, this.allStorages);
 				return this;
 			},
-			check: function (type) {
-				type = type || this.type;
-				if (_storages.hasOwnProperty(type))
-					return _storages[type].check();
+			check: function (storage) {
+				storage = storage || this.currentStorage;
+				if (_storages.hasOwnProperty(storage))
+					return _storages[storage].check();
 				return false;
 			},
-			set: function (name, value, type, days) {
-				name = _toStoredKey.call(this, name);
-				if (!name || !this.check(type))
+			set: function (name, value, options) {
+				if (!(name = _toStoredKey.call(this, name)))
 					return;
-				return _storages[type || this.type].set(name, _toStoredValue(value), days || 365);
+				value = _toStoredValue.call(this, value);
+				options = options || {};
+
+				var storages = _toStoragesArray.call(this, options.storages) || this.allStorages;
+				for (var i = 0; i < storages.length; i++) {
+					if (!this.check(storages[i]))
+						continue;
+					_storages[storages[i]].set(name, value, options);
+				}
 			},
-			get: function (name, type) {
-				name = _toStoredKey.call(this, name);
-				if (!name || !this.check(type))
-					return;
-				return _fromStoredValue.call(this, _storages[type || this.type].get(name));
+			get: function (name, options) {
+				if (!(name = _toStoredKey.call(this, name)))
+					return null;
+				options = options || {};
+
+				var value = null,
+					storages = _toStoragesArray.call(this, options.storages) || this.allStorages;
+
+				for (var i = 0; i < storages.length && !value; i++) {
+					if (!this.check(storages[i]))
+						continue;
+					value = _fromStoredValue.call(this, _storages[storages[i]].get(name))
+				}
+				return value;
 			},
-			remove: function (name, type) {
-				name = _toStoredKey.call(this, name);
-				if (!name || !this.check(type))
-					return;
-				_storages[type || this.type].remove(name);
+			remove: function (name, options) {
+				if (!(name = _toStoredKey.call(this, name)))
+					return null;
+				options = options || {};
+
+				var storages = _toStoragesArray.call(this, options.storages) || this.allStorages;
+				for (var i = 0; i < storages.length; i++) {
+					if (!this.check(storages[i]))
+						continue;
+					_storages[storages[i]].remove(name);
+				}
 			},
-			reset: function (type) {
-				if (!this.check(type))
-					return;
-				_storages[type || this.type].reset();
+			reset: function (options) {
+				options = options || {};
+
+				var storages = _toStoragesArray.call(this, options.storages) || this.allStorages;
+				for (var i = 0; i < storages.length; i++) {
+					if (!this.check(storages[i]))
+						continue;
+					_storages[storages[i]].reset();
+				}
 			},
 			// Access to native storages, without namespace or basil value decoration
 			cookie: _storages.cookie,

@@ -3,16 +3,16 @@
 		return new window.Basil.Storage().init(options);
 	};
 
-	Basil.version = '0.2.02';
+	Basil.version = '0.2.03';
 
 	Basil.Storage = function () {
-		var _allStorages = ['local', 'cookie', 'sessions', 'memory'],
+		var _supportedStorages = ['local', 'cookie', 'session', 'memory'],
 			_namespace = function () {
 				var options = this.options || {};
 				return (options.namespace || 'b45i1') + ':';
 			},
 			_detect = function (storages) {
-				storages = _toStoragesArray.call(this, storages) || _allStorages;
+				storages = _toStoragesArray.call(this, storages) || _supportedStorages;
 				for (var i = 0; i < storages.length; i++) {
 					if (this.check(storages[i]))
 						return storages[i];
@@ -195,13 +195,12 @@
 		return {
 			init: function (options) {
 				this.options = options || {};
-
-				this.allStorages = this.options.storages || _allStorages;
-				this.currentStorage = _detect.call(this, this.allStorages);
+				this.supportedStorages = this.options.storages || _supportedStorages;
+				this.defaultStorage = this.check(this.options.storage) ? this.options.storage : _detect.call(this, this.supportedStorages);
 				return this;
 			},
 			check: function (storage) {
-				storage = storage || this.currentStorage;
+				storage = storage || this.defaultStorage;
 				if (_storages.hasOwnProperty(storage))
 					return _storages[storage].check();
 				return false;
@@ -212,7 +211,7 @@
 				value = _toStoredValue.call(this, value);
 				options = options || {};
 
-				var storages = _toStoragesArray.call(this, options.storages) || this.allStorages;
+				var storages = _toStoragesArray.call(this, options.storages) || [this.defaultStorage];
 				for (var i = 0; i < storages.length; i++) {
 					if (!this.check(storages[i]))
 						continue;
@@ -225,9 +224,9 @@
 				options = options || {};
 
 				var value = null,
-					storages = _toStoragesArray.call(this, options.storages) || this.allStorages;
+					storages = _toStoragesArray.call(this, options.storages) || [this.defaultStorage];
 
-				for (var i = 0; i < storages.length && !value; i++) {
+				for (var i = 0; value === null && i < storages.length; i++) {
 					if (!this.check(storages[i]))
 						continue;
 					value = _fromStoredValue.call(this, _storages[storages[i]].get(name))
@@ -239,7 +238,7 @@
 					return null;
 				options = options || {};
 
-				var storages = _toStoragesArray.call(this, options.storages) || this.allStorages;
+				var storages = _toStoragesArray.call(this, options.storages) || [this.defaultStorage];
 				for (var i = 0; i < storages.length; i++) {
 					if (!this.check(storages[i]))
 						continue;
@@ -249,7 +248,7 @@
 			reset: function (options) {
 				options = options || {};
 
-				var storages = _toStoragesArray.call(this, options.storages) || this.allStorages;
+				var storages = _toStoragesArray.call(this, options.storages) || [this.defaultStorage];
 				for (var i = 0; i < storages.length; i++) {
 					if (!this.check(storages[i]))
 						continue;

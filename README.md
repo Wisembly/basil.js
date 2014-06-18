@@ -26,14 +26,14 @@ basil = new window.Basil(options);
 
 // force storage on the go through basil
 // set 'bar' value under 'foo' key in localStorage
-basil.set('foo', 'bar', 'local');
+basil.set('foo', 'bar', { 'storage': 'local' });
 
 // Access native storages
 // With basil API, but without namespace nor JSON parsing for values
 
 // cookies
 basil.cookie.get(key);
-basil.cookie.set(key, value, days);
+basil.cookie.set(key, value, { 'days': days, 'domain': 'mydomain.com' });
 
 // localStorage
 basil.localStorage.get(key);
@@ -55,10 +55,13 @@ options = {
   // default: 'b45i1'
   namespace: 'foo',
 
-  // Type. Specify a Basil supported storage
+  // storages. Specify all Basil supported storages and priority order
+  // default: `['local', 'cookie', 'session', 'memory']`
+  storages: ['cookie', 'local']
+
+  // storage. Specify the default storage to use
   // default: detect best available storage among the supported ones
-  // `['local', 'cookie', 'sessions', 'memory']`
-  type: 'cookie'
+  storage: 'cookie'
 };
 ```
 

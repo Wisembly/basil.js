@@ -3,7 +3,7 @@
 		return new window.Basil.Storage().init(options);
 	};
 
-	Basil.version = '0.2.03';
+	Basil.version = '0.2.1';
 
 	Basil.Storage = function () {
 		var _supportedStorages = ['local', 'cookie', 'session', 'memory'],

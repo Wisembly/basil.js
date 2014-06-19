@@ -3,7 +3,7 @@
 		return new window.Basil.Storage().init(options);
 	};
 
-	Basil.version = '0.2.1';
+	Basil.version = '0.2.5';
 
 	Basil.Storage = function () {
 		var _supportedStorages = ['local', 'cookie', 'session', 'memory'],
@@ -11,11 +11,10 @@
 				var options = this.options || {};
 				return (options.namespace || 'b45i1') + ':';
 			},
-			_detect = function (storages) {
-				storages = _toStoragesArray.call(this, storages) || _supportedStorages;
-				for (var i = 0; i < storages.length; i++) {
-					if (this.check(storages[i]))
-						return storages[i];
+			_detect = function () {
+				for (var i = 0; i < this.supportedStorages.length; i++) {
+					if (this.check(this.supportedStorages[i]))
+						return this.supportedStorages[i];
 				}
 				return null;
 			},
@@ -196,13 +195,18 @@
 			init: function (options) {
 				this.options = options || {};
 				this.supportedStorages = this.options.storages || _supportedStorages;
-				this.defaultStorage = this.check(this.options.storage) ? this.options.storage : _detect.call(this, this.supportedStorages);
+				this.defaultStorage = this.check(this.options.storage) ? this.options.storage : _detect.call(this);
 				return this;
 			},
 			check: function (storage) {
 				storage = storage || this.defaultStorage;
-				if (_storages.hasOwnProperty(storage))
-					return _storages[storage].check();
+				if (_storages.hasOwnProperty(storage)) {
+					for (var i = 0; i < this.supportedStorages.length; i++) {
+						if (storage === this.supportedStorages[i]) {
+							return _storages[storage].check();
+						}
+					}
+				}
 				return false;
 			},
 			set: function (name, value, options) {
@@ -229,7 +233,7 @@
 				for (var i = 0; value === null && i < storages.length; i++) {
 					if (!this.check(storages[i]))
 						continue;
-					value = _fromStoredValue.call(this, _storages[storages[i]].get(name))
+					value = _fromStoredValue.call(this, _storages[storages[i]].get(name));
 				}
 				return value;
 			},

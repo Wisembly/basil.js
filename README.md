@@ -1,6 +1,6 @@
 # Basil.js
 
-The missing Javascript smart persistant layer
+The missing Javascript smart persistence layer
 
 
 ## Basic Usage

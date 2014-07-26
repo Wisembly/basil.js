@@ -75,7 +75,7 @@ npm run-script build
 
 ## Tests
 
-To launch the test suite, make sure you already installed the dependecies using ````npm-install````.
+To launch the test suite, make sure you already installed the dependencies using ````npm-install````.
 Tests are launching in all your installed browsers. They're also launched on Travis CI, in PhantomJS.
 
 ````

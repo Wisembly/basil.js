@@ -1,5 +1,5 @@
 {
-    "name": "basil",
+    "name": "basil.js",
     "version": "0.2.5",
     "scripts": {
         "test": "./node_modules/karma/bin/karma start test/karma.config.js",
@@ -10,7 +10,6 @@
         "karma": "*",
         "karma-mocha": "*",
         "karma-sinon-expect": "*",
-        "karma-detect-browsers": "*",
         "karma-chrome-launcher": "*",
         "karma-firefox-launcher": "*",
         "karma-safari-launcher": "*",

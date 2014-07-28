@@ -1,6 +1,7 @@
 # Basil.js
 
-The missing Javascript smart persistence layer
+The missing Javascript smart persistence layer.
+Unified localstorage, cookie and session storage JavaScript API.
 
 
 ## Basic Usage
@@ -64,6 +65,14 @@ options = {
   storage: 'cookie'
 };
 ```
+
+## Compatibility
+
+- Firefox 3.5+
+- Internet Explorer 7+
+- Chrome
+- Safari
+
 
 ## Build
 

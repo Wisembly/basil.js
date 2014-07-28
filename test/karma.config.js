@@ -2,12 +2,7 @@ module.exports = function(config) {
   config.set({
     basePath: '../',
 
-    frameworks: ['mocha', 'sinon-expect', 'detectBrowsers'],
-
-    detectBrowsers: {
-      enabled: true,
-      usePhantomJS: true
-    },
+    frameworks: ['mocha', 'sinon-expect'],
 
     files: [
         'src/*.js',

@@ -6,7 +6,11 @@
 	Basil.version = '0.2.5';
 
 	Basil.Storage = function () {
-		var _supportedStorages = ['local', 'cookie', 'session', 'memory'],
+		var
+			salt = 'b45i1' + (Math.random() + 1)
+				.toString(36)
+				.substring(7),
+			_supportedStorages = ['local', 'cookie', 'session', 'memory'],
 			_namespace = function () {
 				var options = this.options || {};
 				return (options.namespace || 'b45i1') + ':';
@@ -43,10 +47,11 @@
 			},
 			_storages = {
 				local: {
+					engine: window.localStorage,
 					check: function () {
 						try {
-							window.localStorage.setItem('__xyz__', true);
-							window.localStorage.removeItem('__xyz__');
+							this.engine.setItem(salt, true);
+							this.engine.removeItem(salt);
 						} catch (e) {
 							return false;
 						}
@@ -55,34 +60,29 @@
 					set: function (name, value, options) {
 						if (!name)
 							return;
-						try {
-							window.localStorage.setItem(name, value);
-						} catch (e) {
-							if (e == QUOTA_EXCEEDED_ERR && window.console)
-								window.console.error('localStorage: Quota exceeded');
-							throw(e);
-						}
+						this.engine.setItem(name, value);
 					},
 					get: function (name) {
-						return window.localStorage.getItem(name);
+						return this.engine.getItem(name);
 					},
 					remove: function (name) {
-						window.localStorage.removeItem(name);
+						this.engine.removeItem(name);
 					},
 					reset: function () {
 						var namespace = _namespace.call(this);
-						for (var key, i = 0; i < window.localStorage.length; i++) {
-							key = window.localStorage.key(i);
+						for (var key, i = 0; i < this.engine.length; i++) {
+							key = this.engine.key(i);
 							if (key.indexOf(namespace) === 0)
 								this.remove(key);
 						}
 					}
 				},
 				session: {
+					engine: window.sessionStorage,
 					check: function () {
 						try {
-							window.sessionStorage.setItem('__xyz__', true);
-							window.sessionStorage.removeItem('__xyz__');
+							this.engine.setItem(salt, true);
+							this.engine.removeItem(salt);
 						} catch (e) {
 							return false;
 						}
@@ -91,23 +91,18 @@
 					set: function (name, value, options) {
 						if (!name)
 							return;
-						try {
-							window.sessionStorage.setItem(name, value);
-						} catch (e) {
-							if (e == QUOTA_EXCEEDED_ERR && window.console)
-								window.console.error('localStorage: Quota exceeded');
-							throw(e);
-						}
+						this.engine.setItem(name, value);
 					},
 					get: function (name) {
-						return window.sessionStorage.getItem(name);
+						return this.engine.getItem(name);
 					},
 					remove: function (name) {
-						window.sessionStorage.removeItem(name);
+						this.engine.removeItem(name);
 					},
 					reset: function () {
 						var namespace = _namespace.call(this);
-						for (var key in window.sessionStorage) {
+						for (var key, i = 0; i < this.engine.length; i++) {
+							key = this.engine.key(i);
 							if (key.indexOf(namespace) === 0)
 								this.remove(key);
 						}

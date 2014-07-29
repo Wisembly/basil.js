@@ -52,7 +52,7 @@ Here is the whole `options` object that you could give to Basil:
 
 ```javascript
 options = {
-  // Namespace. Namespace you Basil stored data
+  // Namespace. Namespace your Basil stored data
   // default: 'b45i1'
   namespace: 'foo',
 
@@ -76,7 +76,7 @@ options = {
 
 ## Build
 
-To generate the production files, make sure you already installed the dependencies using ````npm install```` and then just use:
+To generate the production files, make sure you have already installed the dependencies using ````npm install```` and then just use:
 
 ````
 npm run-script build
@@ -84,7 +84,7 @@ npm run-script build
 
 ## Tests
 
-To launch the test suite, make sure you already installed the dependencies using ````npm-install````.
+To launch the test suite, make sure you have already installed the dependencies using ````npm-install````.
 Tests are launching in all your installed browsers. They're also launched on Travis CI, in PhantomJS.
 
 ````

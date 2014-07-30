@@ -34,7 +34,7 @@ basil.set('foo', 'bar', { 'storage': 'local' });
 
 // cookies
 basil.cookie.get(key);
-basil.cookie.set(key, value, { 'days': days, 'domain': 'mydomain.com' });
+basil.cookie.set(key, value, { 'expireDays': days, 'domain': 'mydomain.com' });
 
 // localStorage
 basil.localStorage.get(key);
@@ -63,13 +63,18 @@ options = {
   // storage. Specify the default storage to use
   // default: detect best available storage among the supported ones
   storage: 'cookie'
+
+  // expireDays. Default number of days before cookies expiration
+  // default: 365
+  expireDays: 31
+
 };
 ```
 
 ## Compatibility
 
 - Firefox 3.5+
-- Internet Explorer 7+
+- Internet Explorer 7+ (needs to include //cdnjs.cloudflare.com/ajax/libs/json2/20130526/json2.min.js)
 - Chrome
 - Safari
 

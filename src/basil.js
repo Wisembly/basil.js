@@ -16,7 +16,7 @@
 		return new Basil.Storage().init(options);
 	};
 
-	Basil.version = '0.3.0';
+	Basil.version = '0.3.1';
 
 	Basil.options = Object.extend({
 		namespace: 'b45i1',
@@ -255,6 +255,17 @@
 		};
 	};
 
+	// browser export
 	window.Basil = Basil;
+
+	// AMD export
+	if (typeof define === 'function' && define.amd) {
+		define(function() {
+			return Basil;
+		});
+	// commonjs export
+	} else if (typeof module !== 'undefined' && module.exports) {
+		module.exports = Basil;
+	}
 
 })();

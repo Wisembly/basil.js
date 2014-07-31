@@ -1,30 +1,35 @@
 (function () {
 
-	// Utils
-	Object.extend = function () {
-		var destination = typeof arguments[0] === 'object' ? arguments[0] : {};
-		for (var i = 1; i < arguments.length; i++) {
-			if (arguments[i] && typeof arguments[i] === 'object')
-				for (var property in arguments[i])
-					destination[property] = arguments[i][property];
-		}
-		return destination;
-	};
-
 	// Basil
 	var Basil = function (options) {
 		return new Basil.Storage().init(options);
 	};
 
-	Basil.version = '0.3.1';
+	// Version
+	Basil.version = '0.3.2';
 
-	Basil.options = Object.extend({
+	// Utils
+	Basil.utils = {
+		extend: function () {
+			var destination = typeof arguments[0] === 'object' ? arguments[0] : {};
+			for (var i = 1; i < arguments.length; i++) {
+				if (arguments[i] && typeof arguments[i] === 'object')
+					for (var property in arguments[i])
+						destination[property] = arguments[i][property];
+			}
+			return destination;
+		}
+	};
+
+	// Options
+	Basil.options = Basil.utils.extend({
 		namespace: 'b45i1',
 		storage: null,
 		storages: ['local', 'cookie', 'session', 'memory'],
 		expireDays: 365
 	}, window.Basil ? window.Basil.options : {});
 
+	// Storage
 	Basil.Storage = function () {
 		var _salt = 'b45i1' + (Math.random() + 1)
 				.toString(36)
@@ -77,17 +82,19 @@
 			remove: function (name) {
 				this.engine.removeItem(name);
 			},
-			reset: function () {
+			reset: function (namespace) {
 				for (var key, i = 0; i < this.engine.length; i++) {
 					key = this.engine.key(i);
-					if (key.indexOf(this.options.namespace) === 0)
+					if (key.indexOf(namespace) === 0) {
 						this.remove(key);
+						i--;
+					}
 				}
 			}
 		};
 
 		// session storage
-		_storages['session'] = Object.extend({}, _storages['local'], {
+		_storages['session'] = Basil.utils.extend({}, _storages['local'], {
 			engine: window.sessionStorage
 		});
 
@@ -108,9 +115,9 @@
 			remove: function (name) {
 				delete this._hash[name];
 			},
-			reset: function () {
+			reset: function (namespace) {
 				for (var key in this._hash) {
-					if (key.indexOf(this.options.namespace) === 0)
+					if (key.indexOf(namespace) === 0)
 						this.remove(key);
 				}
 			}
@@ -157,13 +164,13 @@
 					this.set(name, '', { expireDays: -1, domain: '.' + domainParts.slice(- i).join('.') });
 				}
 			},
-			reset: function () {
+			reset: function (namespace) {
 				var cookies = document.cookie.split(';');
 
 				for (var i = 0; i < cookies.length; i++) {
 					var cookie = cookies[i].replace(/^\s*/, ''),
 						key = cookie.substr(0, cookie.indexOf('='));
-					if (key.indexOf(this.options.namespace) === 0)
+					if (key.indexOf(namespace) === 0)
 						this.remove(key);
 				}
 			}
@@ -171,7 +178,7 @@
 
 		return {
 			init: function (options) {
-				this.options = Object.extend({}, Basil.options, options);
+				this.options = Basil.utils.extend({}, Basil.options, options);
 
 				this.supportedStorages = {};
 				for (var i = 0, storage; i < this.options.storages.length; i++) {
@@ -200,7 +207,7 @@
 				if (!(name = _toStoredKey(this.options.namespace, name)))
 					return;
 				value = _toStoredValue(value);
-				options = Object.extend({
+				options = Basil.utils.extend({
 					expireDays: this.options.expireDays
 				}, options);
 
@@ -245,7 +252,7 @@
 				for (var i = 0; i < storages.length; i++) {
 					if (!this.check(storages[i]))
 						continue;
-					_storages[storages[i]].reset();
+					_storages[storages[i]].reset(this.options.namespace);
 				}
 			},
 			// Access to native storages, without namespace or basil value decoration

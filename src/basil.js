@@ -1,30 +1,35 @@
 (function () {
 
-	// Utils
-	Object.extend = function () {
-		var destination = typeof arguments[0] === 'object' ? arguments[0] : {};
-		for (var i = 1; i < arguments.length; i++) {
-			if (arguments[i] && typeof arguments[i] === 'object')
-				for (var property in arguments[i])
-					destination[property] = arguments[i][property];
-		}
-		return destination;
-	};
-
 	// Basil
 	var Basil = function (options) {
 		return new Basil.Storage().init(options);
 	};
 
+	// Version
 	Basil.version = '0.3.1';
 
-	Basil.options = Object.extend({
+	// Utils
+	Basil.utils = {
+		extend: function () {
+			var destination = typeof arguments[0] === 'object' ? arguments[0] : {};
+			for (var i = 1; i < arguments.length; i++) {
+				if (arguments[i] && typeof arguments[i] === 'object')
+					for (var property in arguments[i])
+						destination[property] = arguments[i][property];
+			}
+			return destination;
+		}
+	};
+
+	// Options
+	Basil.options = Basil.utils.extend({
 		namespace: 'b45i1',
 		storage: null,
 		storages: ['local', 'cookie', 'session', 'memory'],
 		expireDays: 365
 	}, window.Basil ? window.Basil.options : {});
 
+	// Storage
 	Basil.Storage = function () {
 		var _salt = 'b45i1' + (Math.random() + 1)
 				.toString(36)
@@ -89,7 +94,7 @@
 		};
 
 		// session storage
-		_storages['session'] = Object.extend({}, _storages['local'], {
+		_storages['session'] = Basil.utils.extend({}, _storages['local'], {
 			engine: window.sessionStorage
 		});
 
@@ -173,7 +178,7 @@
 
 		return {
 			init: function (options) {
-				this.options = Object.extend({}, Basil.options, options);
+				this.options = Basil.utils.extend({}, Basil.options, options);
 
 				this.supportedStorages = {};
 				for (var i = 0, storage; i < this.options.storages.length; i++) {
@@ -202,7 +207,7 @@
 				if (!(name = _toStoredKey(this.options.namespace, name)))
 					return;
 				value = _toStoredValue(value);
-				options = Object.extend({
+				options = Basil.utils.extend({
 					expireDays: this.options.expireDays
 				}, options);
 

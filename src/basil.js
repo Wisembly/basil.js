@@ -77,11 +77,13 @@
 			remove: function (name) {
 				this.engine.removeItem(name);
 			},
-			reset: function () {
+			reset: function (namespace) {
 				for (var key, i = 0; i < this.engine.length; i++) {
 					key = this.engine.key(i);
-					if (key.indexOf(this.options.namespace) === 0)
+					if (key.indexOf(namespace) === 0) {
 						this.remove(key);
+						i--;
+					}
 				}
 			}
 		};
@@ -108,9 +110,9 @@
 			remove: function (name) {
 				delete this._hash[name];
 			},
-			reset: function () {
+			reset: function (namespace) {
 				for (var key in this._hash) {
-					if (key.indexOf(this.options.namespace) === 0)
+					if (key.indexOf(namespace) === 0)
 						this.remove(key);
 				}
 			}
@@ -157,13 +159,13 @@
 					this.set(name, '', { expireDays: -1, domain: '.' + domainParts.slice(- i).join('.') });
 				}
 			},
-			reset: function () {
+			reset: function (namespace) {
 				var cookies = document.cookie.split(';');
 
 				for (var i = 0; i < cookies.length; i++) {
 					var cookie = cookies[i].replace(/^\s*/, ''),
 						key = cookie.substr(0, cookie.indexOf('='));
-					if (key.indexOf(this.options.namespace) === 0)
+					if (key.indexOf(namespace) === 0)
 						this.remove(key);
 				}
 			}
@@ -245,7 +247,7 @@
 				for (var i = 0; i < storages.length; i++) {
 					if (!this.check(storages[i]))
 						continue;
-					_storages[storages[i]].reset();
+					_storages[storages[i]].reset(this.options.namespace);
 				}
 			},
 			// Access to native storages, without namespace or basil value decoration

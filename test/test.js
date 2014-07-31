@@ -36,6 +36,37 @@
 			});
 		});
 
+		describe('Functional Tests', function () {
+			var data = {
+				str: 'hello world',
+				nb: 42,
+				obj: { foo: 'bar', baz: 'quux' },
+				arr: ['foo', 42, 'bar']
+			};
+			it('should be able to set data', function () {
+				var basil = new window.Basil();
+				for (var key in data) {
+					basil.set(key, data[key]);
+					expect(basil.get(key)).to.eql(data[key]);
+				}
+			});
+			it('should be able to remove data', function () {
+				var basil = new window.Basil();
+				for (var key in data) {
+					basil.remove(key);
+					expect(basil.get(key)).to.be(null);
+				}
+			});
+			it('should be able to reset all data', function () {
+				var basil = new window.Basil();
+				for (var key in data)
+					basil.set(key, data[key]);
+				basil.reset();
+				for (var key in data)
+					expect(basil.get(key)).to.be(null);
+			});
+		});
+
 		if (new window.Basil().localStorage.check()) {
 			describe('localStorage', function () {
 				var _engine = {

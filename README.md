@@ -74,7 +74,7 @@ options = {
 ## Compatibility
 
 - Firefox 3.5+
-- Internet Explorer 7+ (needs to include //cdnjs.cloudflare.com/ajax/libs/json2/20130526/json2.min.js)
+- Internet Explorer 7+ (needs to include [json2.js](//cdnjs.cloudflare.com/ajax/libs/json2/20130526/json2.min.js]))
 - Chrome
 - Safari
 

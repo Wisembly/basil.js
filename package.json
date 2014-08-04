@@ -2,8 +2,8 @@
     "name": "basil.js",
     "version": "0.3.2",
     "scripts": {
-        "test": "./node_modules/karma/bin/karma start test/karma.config.js",
-        "build": "./node_modules/gulp/bin/gulp.js"
+        "test": "node node_modules/karma/bin/karma start test/karma.config.js",
+        "build": "node node_modules/gulp/bin/gulp.js"
     },
     "dependencies": {},
     "devDependencies": {

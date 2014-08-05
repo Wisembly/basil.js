@@ -13,6 +13,7 @@
 
   Basil.List = function () {
     return {
+      _listPlugin: true,
       blpop: function () {
         throw new Error('not implemented yet');
       },
@@ -25,22 +26,21 @@
       lindex: function (key, index) {
         var list = this.get(key) || [];
 
-        if (i < 0)
-          i = list.length + i;
+        if (index < 0)
+          index = list.length + index;
 
-        return list[i] || null;
+        return list[index] || null;
       },
       linsert: function (key, where, pivot, value) {
         var
           index = -1,
-          list = this.get(key) || [],
-          clone = [];
-
-        if ('string' !== typeof value && 'number' !== typeof value)
-          throw new Error('supported values are only strings and numbers');
+          list = this.get(key) || [];
 
         if ('BEFORE' !== where && 'AFTER' !== where)
           throw new Error('AFTER|BEFORE');
+
+        if ('string' !== typeof value && 'number' !== typeof value)
+          throw new Error('supported values are only strings and numbers');
 
         for (var i = 0; i < list.length; i++) {
           if (pivot === list[i]) {
@@ -52,8 +52,8 @@
         if (-1 === index)
           return index;
 
-        list.splice('BEFORE' === where ? i - 1 : i, 0, value);
-        this.set(key, clone);
+        list.splice('AFTER' === where ? i - 1 : i, 0, value);
+        this.set(key, list);
 
         return list.length;
       },

@@ -1,5 +1,4 @@
 (function () {
-
 	// Basil
 	var Basil = function (options) {
 		return new Basil.Storage().init(options);

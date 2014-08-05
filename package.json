@@ -3,6 +3,8 @@
     "version": "0.3.2",
     "scripts": {
         "test": "node node_modules/karma/bin/karma start test/karma.config.js",
+        "test-plugins": "node node_modules/karma/bin/karma start test/karma.plugins.config.js",
+        "test-all": "npm run-script test && npm run-script test-plugins",
         "build": "node node_modules/gulp/bin/gulp.js"
     },
     "dependencies": {},

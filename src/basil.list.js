@@ -7,11 +7,20 @@
     factory(window.Basil); // Browser global
   }
 }(function (Basil) {
-  BasilList = function (options) {
+  var BasilList = function (options) {
     return new Basil.utils.extend(Basil.Storage().init(options), Basil.List(options));
   };
 
   Basil.List = function () {
+    var _toIndex = function (index, length) {
+        if (index < 0)
+          index = length + index;
+
+        if (index < 0 || index >= length)
+          throw new Error("ERR index out of range");
+        return index;
+    };
+
     return {
       _listPlugin: true,
       blpop: function () {
@@ -25,15 +34,12 @@
       },
       lindex: function (key, index) {
         var list = this.get(key) || [];
-
-        if (index < 0)
-          index = list.length + index;
+        index = _toIndex(index, list.length);
 
         return list[index] || null;
       },
       linsert: function (key, where, pivot, value) {
-        var
-          index = -1,
+        var index = -1,
           list = this.get(key) || [];
 
         if ('BEFORE' !== where && 'AFTER' !== where)
@@ -61,8 +67,7 @@
         return (this.get(key) || []).length;
       },
       lpop: function (key) {
-        var
-          list = this.get(key) || [],
+        var list = this.get(key) || [],
           value = list.shift();
         this.set(key, list);
 
@@ -91,22 +96,17 @@
       },
       lset: function (key, index, value) {
         var list = this.get(key) || [];
-
-        if (index < 0)
-          index = list.length + i;
-
-        if (index < 0 || index >= list.length)
-          throw new Error("ERR index out of range");
-
+        index = _toIndex(index, list.length);
         list[index] = value;
+        this.set(key, list);
+
         return 'OK';
       },
       ltrim: function (key, start, stop) {
         throw new Error('not implemented yet');
       },
       rpop: function (key) {
-        var
-          list = this.get(key) || [],
+        var list = this.get(key) || [],
           value = list.pop();
         this.set(key, list);
 
@@ -128,6 +128,7 @@
     };
   };
 
+  // browser export
   window.Basil = BasilList;
 
   // AMD export

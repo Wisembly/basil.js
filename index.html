@@ -104,13 +104,38 @@ Unified localstorage, cookie and session storage JavaScript API.</p>
 
 <ul>
 <li>Firefox 3.5+</li>
-<li>Internet Explorer 7+ (needs to include <a href="//cdnjs.cloudflare.com/ajax/libs/json2/20130526/json2.min.js%5D">json2.js</a>)</li>
-<li>Chrome</li>
-<li>Safari</li>
+<li>Internet Explorer 7 (requires <a href="//cdnjs.cloudflare.com/ajax/libs/json2/20130526/json2.min.js%5D">json2.js</a>)</li>
+<li>Internet Explorer 8+</li>
+<li>Chrome 4+</li>
+<li>Safari 4+</li>
 </ul><h2>
+<a name="plugins" class="anchor" href="#plugins"><span class="octicon octicon-link"></span></a>Plugins</h2>
+
+<h3>
+<a name="list-plugin" class="anchor" href="#list-plugin"><span class="octicon octicon-link"></span></a>List plugin</h3>
+
+<p>This plugin mimics <a href="http://redis.io/commands#list">Redis Lists</a> methods and
+behaviors. Here are the (yet) supported methods.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">basil</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">window</span><span class="p">.</span><span class="nx">Basil</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">lindex</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">index</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">linsert</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">where</span><span class="p">,</span> <span class="nx">pivot</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">llen</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">lpop</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">lpush</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">lrange</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">stop</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">lrem</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">count</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">lset</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">ltrim</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">stop</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">rpop</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+<span class="nx">basil</span><span class="p">.</span><span class="nx">rpush</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+</pre></div>
+
+<h2>
 <a name="build" class="anchor" href="#build"><span class="octicon octicon-link"></span></a>Build</h2>
 
-<p>To generate the production files, make sure you have already installed the dependencies using <code>npm install</code> and then just use:</p>
+<p>To generate the production files, make sure you have already installed the
+dependencies using <code>npm install</code> and then just use:</p>
 
 <pre><code>npm run-script build
 </code></pre>
@@ -118,10 +143,13 @@ Unified localstorage, cookie and session storage JavaScript API.</p>
 <h2>
 <a name="tests" class="anchor" href="#tests"><span class="octicon octicon-link"></span></a>Tests</h2>
 
-<p>To launch the test suite, make sure you have already installed the dependencies using <code>npm install</code>.
-Tests are launching in all your installed browsers. They're also launched on Travis CI, in PhantomJS.</p>
+<p>To launch the test suite, make sure you have already installed the dependencies
+using <code>npm install</code>.
+Tests are launching in all your installed browsers. They're also launched on
+Travis CI, in PhantomJS.</p>
 
 <pre><code>npm test
+npm run-script test-plugins
 </code></pre>
 
 <h2>

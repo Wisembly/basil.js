@@ -20,25 +20,33 @@
 			expect(basil.lindex('key', 42)).to.be(null);
 		});
 		it('should have linsert method', function () {
-			expect(basil.linsert('key', 'AFTER', 'foo', 'baz')).to.be(3);
-			expect(basil.get('key')).to.be.eql(['foo', 'baz', 'bar']);
-
-			try {
-				basil.linsert('key', 'bar');
-				expect().fail("should not pass");
-			} catch (e) {
-				expect(e.message).to.be('AFTER|BEFORE');
-			}
-
 			try {
 				basil.linsert('key', 'AFTER');
 				expect().fail("should not pass");
 			} catch (e) {
-				expect(e.message).to.be('supported values are only strings and numbers');
+				expect(e.message).to.be('ERR wrong number of arguments for \'linsert\' command');
 			}
 
+			try {
+				basil.linsert('key', 'bar', 'foo', 'bar');
+				expect().fail("should not pass");
+			} catch (e) {
+				expect(e.message).to.be('ERR syntax error');
+			}
+
+			try {
+				basil.linsert('key', 'bar', { hello: 'world' }, 'bar');
+				expect().fail("should not pass");
+			} catch (e) {
+				expect(e.message).to.be('ERR syntax error');
+			}
+
+			expect(basil.linsert('key', 'AFTER', 'foo', 'baz')).to.be(3);
+			expect(basil.get('key')).to.be.eql(['foo', 'baz', 'bar']);
 			expect(basil.linsert('key', 'BEFORE', 'foo', 'bux')).to.be(4);
 			expect(basil.get('key')).to.be.eql(['bux', 'foo', 'baz', 'bar']);
+			expect(basil.linsert('key', 'AFTER', 'donotexist', 'val')).to.be(-1);
+			expect(basil.linsert('donotexist', 'AFTER', 'donotexist', 'val')).to.be(0);
 		});
 		it('should have llen method', function () {
 			expect(basil.llen('key')).to.be(2);
@@ -66,7 +74,40 @@
 			expect(basil.lrange('key', -100, 100)).to.eql(['foo', 'bar', 'baz']);
 			expect(basil.lrange('key', 5, 10)).to.eql([]);
 		});
-		it.skip('should have lrem method');
+		it('should have lrem method', function () {
+			try {
+				basil.lrem('donotexist');
+				expect().fail();
+			} catch (e) {
+				expect(e.message).to.be('ERR wrong number of arguments for \'lrem\' command');
+			}
+
+			try {
+				basil.lrem('key', -2, { hello: 'world' });
+				expect().fail();
+			} catch (e) {
+				expect(e.message).to.be('ERR syntax error');
+			}
+
+			expect(basil.lrem('donotexist', 2, 'foo')).to.be(0);
+
+			var set = ['foo', 'foo', 'bar', 'baz', 'bar', 'foo', 'foo'];
+			basil.set('key', set);
+			expect(basil.lrem('key', -2, 'foo')).to.be(2);
+			expect(basil.get('key')).to.eql(['foo', 'foo', 'bar', 'baz', 'bar']);
+
+			basil.set('key', set);
+			expect(basil.lrem('key', 1, 'bar')).to.be(1);
+			expect(basil.get('key')).to.eql(['foo', 'foo', 'baz', 'bar', 'foo', 'foo']);
+
+			basil.set('key', set);
+			expect(basil.lrem('key', 0, 'foo')).to.be(4);
+			expect(basil.get('key')).to.eql(['bar', 'baz', 'bar']);
+
+			basil.set('key', set);
+			expect(basil.lrem('key', -10, 'bar')).to.be(2);
+
+		});
 		it('should have lset method', function () {
 			try {
 				basil.lset('donotexist', 0, 'foo');

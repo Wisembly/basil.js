@@ -48,11 +48,19 @@
 				var index = -1,
 					list = this.get(key) || [];
 
-				if ('BEFORE' !== where && 'AFTER' !== where)
-					throw new Error('AFTER|BEFORE');
+				if (0 === list.length)
+					return 0;
 
-				if ('string' !== typeof value && 'number' !== typeof value)
-					throw new Error('supported values are only strings and numbers');
+				if ('undefined' === typeof value || 'undefined' === typeof pivot)
+					throw new Error('ERR wrong number of arguments for \'linsert\' command');
+
+				if ('BEFORE' !== where && 'AFTER' !== where)
+					throw new Error('ERR syntax error');
+
+				// added here for Basil, even if objects are supported
+				// we to not support (yet?) object comparison, too heavy
+				if ('number' !== typeof pivot && 'string' !== typeof pivot)
+					throw new Error('ERR syntax error');
 
 				for (var i = 0; i < list.length; i++) {
 					if (pivot === list[i]) {
@@ -102,7 +110,47 @@
 				return list.slice(start, stop + 1);
 			},
 			lrem: function (key, count, value) {
-				throw new Error('not implemented yet');
+				if ('undefined' === typeof count || 'undefined' === typeof value)
+					throw new Error('ERR wrong number of arguments for \'lrem\' command');
+
+				var list = this.get(key) || [];
+
+				if (0 === list.length)
+					return 0;
+
+				// added here for Basil, even if objects are supported
+				// we to not support (yet?) object comparison, too heavy
+				if ('number' !== typeof value && 'string' !== typeof value)
+					throw new Error('ERR syntax error');
+
+				var index = count >= 0 ? 0 : list.length - 1,
+					length = list.length,
+					iteration = 0,
+					removed = 0;
+
+				// iterate on whole list or stop if we found exactly the right count occurences
+				while (iteration < length && (0 === count || (0 !== count && removed !== Math.abs(count)))) {
+
+					if (value === list[index]) {
+						list.splice(index, 1);
+						removed++;
+
+						// we removed an element, we need to decrease index if we are
+						// looping from 0 to length otherwise we'll skip some values..
+						if (count >= 0)
+							index--;
+					}
+
+					iteration++;
+					count >= 0 ? index++ : index--;
+				}
+
+				if (0 === list.length)
+					this.remove(key);
+				else
+					this.set(key, list);
+
+				return removed;
 			},
 			lset: function (key, index, value) {
 				var list = this.get(key) || [];

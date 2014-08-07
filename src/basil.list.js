@@ -8,7 +8,7 @@
 	}
 }(function (Basil) {
 	var BasilList = function (options) {
-	return new Basil.utils.extend(Basil.Storage().init(options), Basil.List(options));
+		return new Basil.utils.extend(Basil.Storage().init(options), Basil.List(options));
 	};
 
 	Basil.List = function () {
@@ -58,7 +58,7 @@
 					throw new Error('ERR syntax error');
 
 				// added here for Basil, even if objects are supported
-				// we to not support (yet?) object comparison, too heavy
+				// we do not support (yet?) object comparison, too heavy
 				if ('number' !== typeof pivot && 'string' !== typeof pivot)
 					throw new Error('ERR syntax error');
 

@@ -91,9 +91,9 @@
 				var sourceSet = this.get(source) || [],
                                         destinationSet = this.get(destination) || [];
                                 
-                                if(sourceSet.length === 0 || !_contains(source, member)) {
+                                if(sourceSet.length === 0 || !_contains(sourceSet, member)) {
                                     return 0;
-                                }
+                                }                                
                                 
                                 if(!_contains(destinationSet, member)) {
                                     destinationSet.push(member);

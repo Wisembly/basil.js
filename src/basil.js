@@ -64,7 +64,7 @@
 			};
 
 		// local storage
-		_storages['local'] = {
+		_storages.local = {
 			engine: window.localStorage,
 			check: function () {
 				try {
@@ -98,12 +98,12 @@
 		};
 
 		// session storage
-		_storages['session'] = Basil.utils.extend({}, _storages['local'], {
+		_storages.session = Basil.utils.extend({}, _storages.local, {
 			engine: window.sessionStorage
 		});
 
 		// memory storage
-		_storages['memory'] = {
+		_storages.memory = {
 			_hash: {},
 			check: function () {
 				return true;
@@ -128,7 +128,7 @@
 		};
 
 		// cookie storage
-		_storages['cookie'] = {
+		_storages.cookie = {
 			check: function () {
 				return navigator.cookieEnabled;
 			},

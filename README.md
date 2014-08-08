@@ -104,8 +104,28 @@ basil.rpop(key);
 basil.rpush(key, value);
 ```
 
-Have a look to it if you want to implement yours!
+### Set plugin
 
+This plugin mimics [Redis Sets](http://redis.io/commands#set) methods and
+behaviors. Except sscan all the methods are implemented.
+
+```javascript
+basil = new window.Basil(options);
+basil.sadd(key, member [members ...]);
+basil.scard(key);
+basil.sdiff(key [keys ...]);
+basil.sdiffstore(destination, key [keys ...]);
+basil.sinter(key [keys ...]);
+basil.sinterstore(destination, key [keys ...]);
+basil.sismember(key, member);
+basil.smember(key);
+basil.smove(source, destination, member);
+basil.spop(key);
+basil.srandmember(key, [count]);
+basil.srem(key, member [members ...]);
+basil.sunion(key [keys ...]);
+basil.sunionstore(destination, key [keys ...]);
+```
 
 ## Build
 

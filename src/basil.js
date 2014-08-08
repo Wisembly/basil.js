@@ -1,7 +1,7 @@
 (function () {
 	// Basil
 	var Basil = function (options) {
-		return new Basil.Storage().init(options);
+		return Basil.utils.extend(Basil.plugins, new Basil.Storage().init(options));
 	};
 
 	// Version
@@ -17,8 +17,13 @@
 						destination[property] = arguments[i][property];
 			}
 			return destination;
+		},
+		registerPlugin: function (methods) {
+			Basil.plugins = this.extend(methods, Basil.plugins);
 		}
 	};
+
+	Basil.plugins = {};
 
 	// Options
 	Basil.options = Basil.utils.extend({

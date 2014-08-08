@@ -7,11 +7,8 @@
 		factory(window.Basil); // Browser global
 	}
 }(function (Basil) {
-	var BasilList = function (options) {
-		return new Basil.utils.extend(Basil.Storage().init(options), Basil.List(options));
-	};
 
-	Basil.List = function () {
+	var BasilList = function () {
 		var _toIndex = function (index, length) {
 			if (index < 0)
 				index = length + index;
@@ -194,17 +191,5 @@
 		};
 	};
 
-	// browser export
-	window.Basil = BasilList;
-
-	// AMD export
-	if (typeof define === 'function' && define.amd) {
-		define(function() {
-			return BasilList;
-		});
-	// commonjs export
-	} else if (typeof module !== 'undefined' && module.exports) {
-		module.exports = BasilList;
-	}
-
+	Basil.utils.registerPlugin(new BasilList());
 }));

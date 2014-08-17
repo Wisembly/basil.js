@@ -36,6 +36,60 @@
                     for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
                     return o;
                 };
+                
+                var _union = function() {
+                    var allElements = [], uniqElements = [];
+                    
+                    for (var i = 0, length = arguments.length; i < length; i++) {
+                        allElements = allElements.concat(arguments[i]);
+                    }
+                    
+                    for (var i = 0, length = allElements.length; i < length; i++) {
+                        if (!_contains(uniqElements, allElements[i])) {
+                            uniqElements.push(allElements[i]);
+                        }
+                    }
+                    
+                    return uniqElements;
+                };
+
+                var _difference = function() {
+                    var firstArray = arguments[0], otherArrays = [], diffArray = [];
+                    
+                    for (var i = 1, length = arguments.length; i < length; i++) {
+                        otherArrays = otherArrays.concat(arguments[i]);
+                    }
+                    
+                    for (var i = 0, length = firstArray.length; i < length; i++) {
+                        if (!_contains(otherArrays, firstArray[i])) {
+                            diffArray.push(firstArray[i]);
+                        }
+                    }
+                    
+                    return diffArray;
+                };
+
+                var _intersection = function() {
+                    var result = [], firstArray = arguments[0],
+                            argsLength = arguments.length;
+                    
+                    for (var i = 0, length = firstArray.length; i < length; i++) {
+                        var item = firstArray[i];
+                        
+                        if (_contains(result, item))
+                            continue;
+                        
+                        for (var j = 1; j < argsLength; j++) {
+                            if (!_contains(arguments[j], item))
+                                break;
+                        }
+                        
+                        if (j === argsLength)
+                            result.push(item);
+                    }
+                    
+                    return result;
+                };
 
 		return {
 			_setPlugin: true,
@@ -64,16 +118,18 @@
                                 return list.length;
 			},
 			sdiff: function () {
-				throw new Error('not implemented yet');
+				return _difference(arguments);
 			},
-			sdiffstore: function () {
-				throw new Error('not implemented yet');
+			sdiffstore: function (key) {
+                                var difference = _difference(Array.prototype.slice.call(arguments, 1));
+				this.set(key, difference);
 			},
                         sinter: function () {
-				throw new Error('not implemented yet');
+				return _intersection(arguments);
 			},
-                        sinterdiff: function () {
-				throw new Error('not implemented yet');
+                        sinterstore: function (key) {
+				var intersection = _intersection(Array.prototype.slice.call(arguments, 1));
+				this.set(key, intersection);
 			},
                         sismember: function (key, member) {
 				var set = this.get(key) || [];
@@ -182,10 +238,11 @@
                                 return removedItems;
 			},
                         sunion: function () {
-				throw new Error('not implemented yet');
+				return _union(arguments);
 			},
-                        sunionstore: function () {
-				throw new Error('not implemented yet');
+                        sunionstore: function (key) {
+				var union = _union(Array.prototype.slice.call(arguments, 1));
+                                this.set(key, union);
 			},
                         sscan: function () {
 				throw new Error('not implemented yet');

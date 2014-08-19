@@ -27,7 +27,10 @@ basil = new window.Basil(options);
 
 // force storage on the go through basil
 // set 'bar' value under 'foo' key in localStorage
-basil.set('foo', 'bar', { 'storage': 'local' });
+basil.set('foo', 'bar', { 'storages': ['local'] });
+
+// set 'bar' value under 'foo' key in localStorage AND cookie
+basil.set('foo', 'bar', { 'storages': ['local', 'cookie'] });
 
 // Access native storages
 // With basil API, but without namespace nor JSON parsing for values
@@ -100,6 +103,9 @@ basil.ltrim(key, start, stop);
 basil.rpop(key);
 basil.rpush(key, value);
 ```
+
+Have a look to it if you want to implement yours!
+
 
 ## Build
 

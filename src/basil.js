@@ -22,8 +22,8 @@
 			Basil.plugins = this.extend(methods, Basil.plugins);
 		}
 	};
-
-	Basil.plugins = {};
+        
+        Basil.plugins = {};
 
 	// Options
 	Basil.options = Basil.utils.extend({

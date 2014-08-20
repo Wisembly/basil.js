@@ -7,11 +7,8 @@
 		factory(window.Basil); // Browser global
 	}
 }(function (Basil) {
-	var BasilSet = function (options) {
-		return new Basil.utils.extend(Basil.Storage().init(options), Basil.Set(options));
-	};
 
-	Basil.Set = function () {
+	var BasilSet = function () {
                 var _indexOf = function(array, item) {
                     
                     for (var i = 0, length = array.length; i < length; i++) {
@@ -38,6 +35,7 @@
                 };
                 
                 var _union = function() {
+                    arguments = arguments[0];
                     var allElements = [], uniqElements = [];
                     
                     for (var i = 0, length = arguments.length; i < length; i++) {
@@ -54,8 +52,8 @@
                 };
 
                 var _difference = function() {
-                    var firstArray = arguments[0], otherArrays = [], diffArray = [];
-                    
+                    arguments = arguments[0];
+                    var firstArray = arguments[0], otherArrays = [], diffArray = [];                    
                     for (var i = 1, length = arguments.length; i < length; i++) {
                         otherArrays = otherArrays.concat(arguments[i]);
                     }
@@ -70,6 +68,7 @@
                 };
 
                 var _intersection = function() {
+                    arguments = arguments[0];
                     var result = [], firstArray = arguments[0],
                             argsLength = arguments.length;
                     
@@ -118,18 +117,36 @@
                                 return list.length;
 			},
 			sdiff: function () {
-				return _difference(arguments);
+                                var args = [], i, length;
+                                for(i = 0, length = arguments.length; i < length; i++) {
+                                    args.push(this.smembers(arguments[i]));
+                                }
+				return _difference(args);
 			},
 			sdiffstore: function (key) {
-                                var difference = _difference(Array.prototype.slice.call(arguments, 1));
+                                var args = [], i, length;
+                                for(i = 1, length = arguments.length; i < length; i++) {
+                                    args.push(this.smembers(arguments[i]));
+                                }
+                                var difference = _difference(args);
 				this.set(key, difference);
+                                return difference.length;
 			},
                         sinter: function () {
-				return _intersection(arguments);
+                                var args = [], i, length;
+                                for(i = 0, length = arguments.length; i < length; i++) {
+                                    args.push(this.smembers(arguments[i]));
+                                }
+				return _intersection(args);
 			},
                         sinterstore: function (key) {
-				var intersection = _intersection(Array.prototype.slice.call(arguments, 1));
+                                var args = [], i, length;
+                                for(i = 1, length = arguments.length; i < length; i++) {
+                                    args.push(this.smembers(arguments[i]));
+                                }
+				var intersection = _intersection(args);
 				this.set(key, intersection);
+                                return intersection.length;
 			},
                         sismember: function (key, member) {
 				var set = this.get(key) || [];
@@ -156,7 +173,7 @@
                                     this.set(destination, destinationSet);
                                     sourceSet.splice(_indexOf(sourceSet, member), 1);
                                     if(sourceSet.length === 0) {
-                                        this.remove(sourceSet);
+                                        this.remove(source);
                                     } else {
                                         this.set(source, sourceSet);
                                     }
@@ -178,7 +195,7 @@
                                 if(arguments[1]) {
                                     member = set[randomIndex];
                                 } else {
-                                    member = set.splice(randomIndex, 1);
+                                    member = set.splice(randomIndex, 1)[0];
                                     if(set.length === 0) {
                                         this.remove(key);
                                     } else {
@@ -238,11 +255,20 @@
                                 return removedItems;
 			},
                         sunion: function () {
-				return _union(arguments);
+                                var args = [], i, length;
+                                for(i = 0, length = arguments.length; i < length; i++) {
+                                    args.push(this.smembers(arguments[i]));
+                                }
+				return _union(args);
 			},
                         sunionstore: function (key) {
-				var union = _union(Array.prototype.slice.call(arguments, 1));
+                                var args = [], i, length;
+                                for(i = 1, length = arguments.length; i < length; i++) {
+                                    args.push(this.smembers(arguments[i]));
+                                }
+				var union = _union(args);
                                 this.set(key, union);
+                                return union.length;
 			},
                         sscan: function () {
 				throw new Error('not implemented yet');
@@ -250,17 +276,6 @@
 		};
 	};
 
-	// browser export
-	window.Basil = BasilSet;
-
-	// AMD export
-	if (typeof define === 'function' && define.amd) {
-		define(function() {
-			return BasilSet;
-		});
-	// commonjs export
-	} else if (typeof module !== 'undefined' && module.exports) {
-		module.exports = BasilSet;
-	}
+	Basil.utils.plugin(new BasilSet);
 
 }));

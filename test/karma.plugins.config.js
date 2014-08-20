@@ -7,7 +7,9 @@ module.exports = function(config) {
     files: [
         'src/basil.js',
         'src/basil.list.js',
-        'test/list.js'
+        'src/basil.set.js',
+        'test/list.js',
+        'test/set.js'
     ],
 
     exclude: [],

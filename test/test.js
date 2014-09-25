@@ -64,6 +64,12 @@
 				basil.reset();
 				for (var key in data)
 					expect(basil.get(key)).to.be(null);
+			}),
+			it('should be able to get all the keys', function() {
+				var basil = new window.Basil();
+				for (var key in data)
+					basil.set(key, data[key]);
+				expect(basil.keys()).to.eql(['str', 'nb', 'obj', 'arr']);
 			});
 		});
 

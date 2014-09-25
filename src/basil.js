@@ -56,6 +56,9 @@
 				}
 				return key;
 			},
+			_toKeyName = function (namespace, name) {
+				return name.replace(namespace + ':', '');
+			},
 			_toStoredValue = function (value) {
 				return JSON.stringify(value);
 			},
@@ -94,6 +97,19 @@
 						i--;
 					}
 				}
+			},
+			keys: function() {
+				var namespace = Basil.options.namespace;
+				var keys = [];
+
+				for (var key, i = 0; i < this.engine.length; i++) {
+					key = this.engine.key(i);
+					if (key.indexOf(namespace) === 0) {
+						keys.push(_toKeyName(namespace, key));
+					}
+				}
+
+				return keys;
 			}
 		};
 
@@ -124,6 +140,17 @@
 					if (key.indexOf(namespace) === 0)
 						this.remove(key);
 				}
+			},
+			keys: function () {
+				var namespace = Basil.options.namespace;
+				var keys = [];
+				
+				for (var key in this._hash) {
+					if (key.indexOf(namespace) === 0)
+						keys.push(_toKeyName(namespace, key));
+				}
+
+				return keys;
 			}
 		};
 
@@ -177,6 +204,20 @@
 					if (key.indexOf(namespace) === 0)
 						this.remove(key);
 				}
+			},
+			keys: function () {
+				var namespace = Basil.options.namespace;
+				var keys = [];
+				var cookies = document.cookie.split(';');
+
+				for (var i = 0; i < cookies.length; i++) {
+					var cookie = cookies[i].replace(/^\s*/, ''),
+						key = cookie.substr(0, cookie.indexOf('='));
+					if (key.indexOf(namespace) === 0)
+						keys.push(_toKeyName(namespace, key));
+				}
+
+				return keys;
 			}
 		};
 
@@ -258,6 +299,19 @@
 						continue;
 					_storages[storages[i]].reset(this.options.namespace);
 				}
+			},
+			keys: function(options) {
+				options = options || {};
+				var keys = [];
+
+				var storages = _toStoragesArray(options.storages) || [this.defaultStorage];
+				for (var i = 0; i < storages.length; i++) {
+					if (!this.check(storages[i]))
+						continue;
+					keys = keys.concat(_storages[storages[i]].keys());
+				}
+
+				return keys;
 			},
 			// Access to native storages, without namespace or basil value decoration
 			cookie: _storages.cookie,

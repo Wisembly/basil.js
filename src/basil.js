@@ -18,6 +18,15 @@
 			}
 			return destination;
 		},
+		uniq: function(array) {
+			var uniqArray = [];
+			for (var i = 0; i < array.length; i++) {
+				if(uniqArray.indexOf(array[i]) === -1) {
+					uniqArray.push(array[i]);
+				}
+			}
+			return uniqArray;
+		},
 		registerPlugin: function (methods) {
 			Basil.plugins = this.extend(methods, Basil.plugins);
 		}
@@ -98,8 +107,7 @@
 					}
 				}
 			},
-			keys: function() {
-				var namespace = Basil.options.namespace;
+			keys: function(namespace) {
 				var keys = [];
 
 				for (var key, i = 0; i < this.engine.length; i++) {
@@ -141,8 +149,7 @@
 						this.remove(key);
 				}
 			},
-			keys: function () {
-				var namespace = Basil.options.namespace;
+			keys: function (namespace) {
 				var keys = [];
 				
 				for (var key in this._hash) {
@@ -205,8 +212,7 @@
 						this.remove(key);
 				}
 			},
-			keys: function () {
-				var namespace = Basil.options.namespace;
+			keys: function (namespace) {
 				var keys = [];
 				var cookies = document.cookie.split(';');
 
@@ -302,13 +308,25 @@
 			},
 			keys: function(options) {
 				options = options || {};
-				var keys = [];
+				var keys = {};
+				var uniqueKeys, allkeys = [];
 
-				var storages = _toStoragesArray(options.storages) || [this.defaultStorage];
+				var storages = _toStoragesArray(options.storages) || this.options.storages;
 				for (var i = 0; i < storages.length; i++) {
 					if (!this.check(storages[i]))
 						continue;
-					keys = keys.concat(_storages[storages[i]].keys());
+					allkeys = allkeys.concat(_storages[storages[i]].keys(this.options.namespace));
+				}
+				var uniqueKeys = Basil.utils.uniq(allkeys);
+				for (var i = 0; i < uniqueKeys.length; i++) {
+					for (var j = 0; j < storages.length; j++) {
+						if(this.get(uniqueKeys[i], { storages: [storages[j]] })) {
+							if (keys[uniqueKeys[i]] instanceof Array) 
+								keys[uniqueKeys[i]].push(storages[j])
+							else
+							 keys[uniqueKeys[i]] = new Array(storages[j]);
+						}
+					}
 				}
 
 				return keys;

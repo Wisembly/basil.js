@@ -67,9 +67,15 @@
 			}),
 			it('should be able to get all the keys', function() {
 				var basil = new window.Basil();
-				for (var key in data)
-					basil.set(key, data[key]);
-				expect(basil.keys()).to.eql(['str', 'nb', 'obj', 'arr']);
+				basil.set('foo', 'i am local', { storages: ['local'] });
+				basil.set('foo', 'i am session', { storages: ['session'] });
+				basil.set('bar', 'i am cookie and session', { storages: ['cookie', 'session'] });
+				basil.set('baz', 'i am session', { storages: ['session'] });
+				expect(basil.keys()).to.eql({
+					'foo': ['local', 'session'], 
+					'bar': ['cookie', 'session'], 
+					'baz': ['session']
+				});
 			});
 		});
 

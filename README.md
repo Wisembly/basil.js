@@ -13,7 +13,7 @@ basil = new window.Basil(options);
 basil.set('foo', 'bar'); // store 'bar' value under 'foo' key
 basil.set('abc', 'xyz'); // store 'xyz' value under 'abc' key
 basil.get('foo'); // returns 'bar'
-basil.keys(); // returns ['abc', 'foo']
+basil.keys(); // returns {'abc': ['local'], 'foo': ['local']}
 basil.remove('foo'); // remove 'foo' value
 
 // advanced methods
@@ -33,6 +33,13 @@ basil.set('foo', 'bar', { 'storages': ['local'] });
 
 // set 'bar' value under 'foo' key in localStorage AND cookie
 basil.set('foo', 'bar', { 'storages': ['local', 'cookie'] });
+
+// set 'xyz' value under 'abc' key in memory
+basil.set('abc', 'xyz', { 'storages': ['memory'] });
+
+// keys
+basil.keys(); // returns {'foo': ['local', 'cookie'], 'abc': ['memory']}
+basic.keys({ 'storages': ['memory'] }); // returns {'abc': ['memory']}
 
 // Access native storages
 // With basil API, but without namespace nor JSON parsing for values

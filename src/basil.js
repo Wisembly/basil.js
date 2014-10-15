@@ -5,7 +5,7 @@
 	};
 
 	// Version
-	Basil.version = '0.3.2';
+	Basil.version = '0.3.3';
 
 	// Utils
 	Basil.utils = {
@@ -17,15 +17,6 @@
 						destination[property] = arguments[i][property];
 			}
 			return destination;
-		},
-		uniq: function(array) {
-			var uniqArray = [];
-			for (var i = 0; i < array.length; i++) {
-				if(uniqArray.indexOf(array[i]) === -1) {
-					uniqArray.push(array[i]);
-				}
-			}
-			return uniqArray;
 		},
 		registerPlugin: function (methods) {
 			Basil.plugins = this.extend(methods, Basil.plugins);
@@ -99,7 +90,7 @@
 				this.engine.removeItem(name);
 			},
 			reset: function (namespace) {
-				for (var key, i = 0; i < this.engine.length; i++) {
+				for (var i = 0, key; i < this.engine.length; i++) {
 					key = this.engine.key(i);
 					if (key.indexOf(namespace) === 0) {
 						this.remove(key);
@@ -107,16 +98,13 @@
 					}
 				}
 			},
-			keys: function(namespace) {
+			keys: function (namespace) {
 				var keys = [];
-
-				for (var key, i = 0; i < this.engine.length; i++) {
+				for (var i = 0, key; i < this.engine.length; i++) {
 					key = this.engine.key(i);
-					if (key.indexOf(namespace) === 0) {
+					if (key.indexOf(namespace) === 0)
 						keys.push(_toKeyName(namespace, key));
-					}
 				}
-
 				return keys;
 			}
 		};
@@ -151,12 +139,9 @@
 			},
 			keys: function (namespace) {
 				var keys = [];
-				
-				for (var key in this._hash) {
+				for (var key in this._hash)
 					if (key.indexOf(namespace) === 0)
 						keys.push(_toKeyName(namespace, key));
-				}
-
 				return keys;
 			}
 		};
@@ -182,7 +167,6 @@
 			},
 			get: function (name) {
 				var cookies = document.cookie.split(';');
-
 				for (var i = 0; i < cookies.length; i++) {
 					var cookie = cookies[i].replace(/^\s*/, '');
 					if (cookie.indexOf(name + '=') === 0)
@@ -195,7 +179,6 @@
 					return;
 				// remove cookie from main domain
 				this.set(name, '', { expireDays: -1 });
-
 				// remove cookie from upper domains
 				var domainParts = document.domain.split('.');
 				for (var i = domainParts.length - 1; i > 0; i--) {
@@ -204,7 +187,6 @@
 			},
 			reset: function (namespace) {
 				var cookies = document.cookie.split(';');
-
 				for (var i = 0; i < cookies.length; i++) {
 					var cookie = cookies[i].replace(/^\s*/, ''),
 						key = cookie.substr(0, cookie.indexOf('='));
@@ -213,16 +195,14 @@
 				}
 			},
 			keys: function (namespace) {
-				var keys = [];
-				var cookies = document.cookie.split(';');
-
+				var keys = [],
+					cookies = document.cookie.split(';');
 				for (var i = 0; i < cookies.length; i++) {
 					var cookie = cookies[i].replace(/^\s*/, ''),
 						key = cookie.substr(0, cookie.indexOf('='));
 					if (key.indexOf(namespace) === 0)
 						keys.push(_toKeyName(namespace, key));
 				}
-
 				return keys;
 			}
 		};
@@ -230,22 +210,19 @@
 		return {
 			init: function (options) {
 				this.options = Basil.utils.extend({}, Basil.options, options);
-
 				this.supportedStorages = {};
 				for (var i = 0, storage; i < this.options.storages.length; i++) {
 					storage = this.options.storages[i];
 					if (_storages.hasOwnProperty(storage))
 						this.supportedStorages[storage] = _storages[storage];
 				}
-
 				this.defaultStorage = this.check(this.options.storage) ? this.options.storage : this.detect();
 				return this;
 			},
 			detect: function () {
-				for (var storage in this.supportedStorages) {
+				for (var storage in this.supportedStorages)
 					if (this.check(storage))
 						return storage;
-				}
 				return null;
 			},
 			check: function (storage) {
@@ -255,81 +232,82 @@
 				return false;
 			},
 			set: function (name, value, options) {
-				if (!(name = _toStoredKey(this.options.namespace, name)))
+				options = options || {};
+				if (!(name = _toStoredKey(options.namespace || this.options.namespace, name)))
 					return;
 				value = _toStoredValue(value);
 				options = Basil.utils.extend({
 					expireDays: this.options.expireDays
 				}, options);
-
 				var storages = _toStoragesArray(options.storages) || [this.defaultStorage];
-				for (var i = 0; i < storages.length; i++) {
-					if (!this.check(storages[i]))
+				for (var i = 0, storage; i < storages.length; i++) {
+					storage = storages[i];
+					if (!this.check(storage))
 						continue;
-					_storages[storages[i]].set(name, value, options);
+					_storages[storage].set(name, value, options);
 				}
 			},
 			get: function (name, options) {
-				if (!(name = _toStoredKey(this.options.namespace, name)))
-					return null;
 				options = options || {};
-
+				if (!(name = _toStoredKey(options.namespace || this.options.namespace, name)))
+					return null;
 				var value = null,
 					storages = _toStoragesArray(options.storages) || [this.defaultStorage];
-
-				for (var i = 0; value === null && i < storages.length; i++) {
-					if (!this.check(storages[i]))
+				for (var i = 0, storage; value === null && i < storages.length; i++) {
+					storage = storages[i];
+					if (!this.check(storage))
 						continue;
-					value = _fromStoredValue(_storages[storages[i]].get(name));
+					value = _fromStoredValue(_storages[storage].get(name));
 				}
 				return value;
 			},
 			remove: function (name, options) {
-				if (!(name = _toStoredKey(this.options.namespace, name)))
-					return null;
 				options = options || {};
-
+				if (!(name = _toStoredKey(options.namespace || this.options.namespace, name)))
+					return null;
 				var storages = _toStoragesArray(options.storages) || [this.defaultStorage];
-				for (var i = 0; i < storages.length; i++) {
-					if (!this.check(storages[i]))
+				for (var i = 0, storage; i < storages.length; i++) {
+					storage = storages[i];
+					if (!this.check(storage))
 						continue;
-					_storages[storages[i]].remove(name);
+					_storages[storage].remove(name);
 				}
 			},
 			reset: function (options) {
 				options = options || {};
-
-				var storages = _toStoragesArray(options.storages) || [this.defaultStorage];
-				for (var i = 0; i < storages.length; i++) {
-					if (!this.check(storages[i]))
+				var storages = _toStoragesArray(options.storages) || [this.defaultStorage],
+					namespace = options.namespace || this.options.namespace;
+				for (var i = 0, storage; i < storages.length; i++) {
+					storage = storages[i];
+					if (!this.check(storage))
 						continue;
-					_storages[storages[i]].reset(this.options.namespace);
+					_storages[storage].reset(namespace);
 				}
 			},
-			keys: function(options) {
+			keys: function (options) {
 				options = options || {};
-				var keys = {};
-				var uniqueKeys, allkeys = [];
-
-				var storages = _toStoragesArray(options.storages) || this.options.storages;
-				for (var i = 0; i < storages.length; i++) {
-					if (!this.check(storages[i]))
+				var keys = [];
+				for (var key in this.keysMap(options))
+					keys.push(key);
+				return keys;
+			},
+			keysMap: function (options) {
+				options = options || {};
+				var map = {},
+					storages = _toStoragesArray(options.storages) || this.options.storages,
+					namespace = options.namespace || this.options.namespace;
+				for (var i = 0, storage, storageKeys; i < storages.length; i++) {
+					storage = storages[i];
+					if (!this.check(storage))
 						continue;
-					allkeys = allkeys.concat(_storages[storages[i]].keys(this.options.namespace));
-				}
-				var uniqueKeys = Basil.utils.uniq(allkeys);
-				for (var i = 0; i < uniqueKeys.length; i++) {
-					for (var j = 0; j < storages.length; j++) {
-						if(this.get(uniqueKeys[i], { storages: [storages[j]] })) {
-							if (keys[uniqueKeys[i]] instanceof Array) 
-								keys[uniqueKeys[i]].push(storages[j])
-							else
-							 keys[uniqueKeys[i]] = new Array(storages[j]);
-						}
+					storageKeys = _storages[storage].keys(namespace);
+					for (var j = 0, key; j < storageKeys.length; j++) {
+						key = storageKeys[j];
+						map[key] = map[key] instanceof Array ? map[key] : [];
+						map[key].push(storage);
 					}
 				}
-
-				return keys;
+				return map;
 			},
 			// Access to native storages, without namespace or basil value decoration
 			cookie: _storages.cookie,

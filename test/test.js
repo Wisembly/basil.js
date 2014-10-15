@@ -38,16 +38,39 @@
 
 		describe('Functional Tests', function () {
 			var data = {
-				str: 'hello world',
-				nb: 42,
-				obj: { foo: 'bar', baz: 'quux' },
-				arr: ['foo', 42, 'bar']
-			};
+					str: 'hello world',
+					nb: 42,
+					obj: { foo: 'bar', baz: 'quux' },
+					arr: ['foo', 42, 'bar']
+				},
+				alt = {
+					str: 'foobar',
+					nb: -1,
+					obj: { hello: 'world', foo: 'bar' },
+					arr: ['quux', -1, 'baz']
+				};
+
 			it('should be able to set data', function () {
 				var basil = new window.Basil();
 				for (var key in data) {
 					basil.set(key, data[key]);
 					expect(basil.get(key)).to.eql(data[key]);
+				}
+			});
+			it('should be able to set data of a given namespace and retrieve it', function () {
+				var basil = new window.Basil();
+				for (var key in alt) {
+					basil.set(key, alt[key], { namespace: 'alt' });
+					expect(basil.get(key, { namespace: 'alt' })).to.eql(alt[key]);
+					expect(basil.get(key)).to.eql(data[key]);
+				}
+			});
+			it('should be able to remove data of a given namespace', function () {
+				var basil = new window.Basil();
+				for (var key in alt) {
+					basil.remove(key, { namespace: 'alt' });
+					expect(basil.get(key)).to.eql(data[key]);
+					expect(basil.get(key, { namespace: 'alt' })).to.be(null);
 				}
 			});
 			it('should be able to remove data', function () {
@@ -64,18 +87,57 @@
 				basil.reset();
 				for (var key in data)
 					expect(basil.get(key)).to.be(null);
-			}),
+			});
+			it('should be able to reset all data of a given namespace', function () {
+				var basil = new window.Basil();
+				for (var key in alt) {
+					basil.set(key, alt[key], { namespace: 'alt' });
+					basil.set(key, data[key]);
+				}
+				basil.reset({ namespace: 'alt' });
+				for (var key in alt) {
+					expect(basil.get(key)).to.eql(data[key]);
+					expect(basil.get(key, { namespace: 'alt' })).to.be(null);
+				}
+				basil.reset();
+			});
 			it('should be able to get all the keys', function() {
 				var basil = new window.Basil();
 				basil.set('foo', 'i am local', { storages: ['local'] });
 				basil.set('foo', 'i am session', { storages: ['session'] });
 				basil.set('bar', 'i am cookie and session', { storages: ['cookie', 'session'] });
 				basil.set('baz', 'i am session', { storages: ['session'] });
-				expect(basil.keys()).to.eql({
-					'foo': ['local', 'session'], 
-					'bar': ['cookie', 'session'], 
+				expect(basil.keys()).to.eql(['foo', 'bar', 'baz']);
+				expect(basil.keysMap()).to.eql({
+					'foo': ['local', 'session'],
+					'bar': ['cookie', 'session'],
 					'baz': ['session']
 				});
+				basil.reset();
+			});
+			it('should be able to get all the keys of a given namespace', function() {
+				var basil = new window.Basil();
+				basil.options.namespace = 'first';
+				basil.set('foo', 'i am local with namespace `first`', { storages: ['local'] });
+				basil.set('foo', 'i am session with namespace `first`', { storages: ['session'] });
+				basil.options.namespace = 'second';
+				basil.set('bar', 'i am cookie and session with namespace `second`', { storages: ['cookie', 'session'] });
+				basil.set('baz', 'i am session with namespace `seconf`', { storages: ['session'] });
+				basil.options.namespace = 'third';
+				expect(basil.keys({ namespace: 'first' })).to.eql(['foo']);
+				expect(basil.keysMap({ namespace: 'first' })).to.eql({
+					'foo': ['local', 'session'],
+				});
+				expect(basil.keys({ namespace: 'second' })).to.eql(['bar', 'baz']);
+				expect(basil.keysMap({ namespace: 'second' })).to.eql({
+					'bar': ['cookie', 'session'],
+					'baz': ['session']
+				});
+				expect(basil.keys({ namespace: 'third' })).to.eql([]);
+				expect(basil.keysMap({ namespace: 'third' })).to.eql({});
+				basil.reset({ namespace: 'first' });
+				basil.reset({ namespace: 'second' });
+				basil.reset({ namespace: 'third' });
 			});
 		});
 

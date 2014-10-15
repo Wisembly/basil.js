@@ -13,7 +13,8 @@ basil = new window.Basil(options);
 basil.set('foo', 'bar'); // store 'bar' value under 'foo' key
 basil.set('abc', 'xyz'); // store 'xyz' value under 'abc' key
 basil.get('foo'); // returns 'bar'
-basil.keys(); // returns {'abc': ['local'], 'foo': ['local']}
+basil.keys(); // returns ['abc', 'foo']
+basil.keysMap(); // returns { 'abc': ['local'], 'foo': ['local'] }
 basil.remove('foo'); // remove 'foo' value
 
 // advanced methods
@@ -23,6 +24,8 @@ basil.reset(); // reset all stored values under namespace for current storage
 
 
 ## Advanced Usage
+
+### Storages
 
 ```javascript
 basil = new window.Basil(options);
@@ -37,9 +40,13 @@ basil.set('foo', 'bar', { 'storages': ['local', 'cookie'] });
 // set 'xyz' value under 'abc' key in memory
 basil.set('abc', 'xyz', { 'storages': ['memory'] });
 
-// keys
-basil.keys(); // returns {'foo': ['local', 'cookie'], 'abc': ['memory']}
-basic.keys({ 'storages': ['memory'] }); // returns {'abc': ['memory']}
+// retrieve keys
+basil.keys(); // returns ['foo', 'abc']
+basic.keys({ 'storages': ['memory'] }); // returns ['abc']
+
+// retrive keys map
+basil.keysMap(); // returns { 'foo': ['local', 'cookie'], 'abc': ['memory'] }
+basic.keysMap({ 'storages': ['memory'] }); // returns { 'abc': ['memory'] }
 
 // Access native storages
 // With basil API, but without namespace nor JSON parsing for values
@@ -55,6 +62,39 @@ basil.localStorage.set(key, value);
 // sessionStorage
 basil.sessionStorage.get(key);
 basil.sessionStorage.set(key, value);
+```
+
+### Namespaces
+
+```javascript
+basil = new window.Basil(options);
+
+// store data under default namespace
+basil.set('hello', 'world');
+
+// store data under a given namespace
+basil.set('hello', 42, { 'namespace': 'alt' });
+basil.set('abc', 'def', { 'namespace': 'alt', 'storages': ['memory'] });
+
+// retrieve data
+basil.get('hello'); // return 'world'
+basil.get('hello', { 'namespace': 'alt' }); // return 42
+
+// retrieves keys
+basil.keys(); // returns ['hello']
+basil.keys({ 'namespace': 'alt' }); // returns ['hello', 'abc']
+
+// retrieves  keys map
+basil.keysMap(); // returns { 'hello': ['local'] }
+basil.keysMap({ 'namespace': 'alt' }); // returns { 'hello': ['local'], 'abc': ['memory'] }
+
+// remove data under a given namespace
+basil.remove('hello', { 'namespace': 'alt' });
+basil.get('hello'); // return 'world'
+basil.get('hello', { 'namespace': 'alt' }); // return null
+
+// reset data under a given namespace
+basil.reset({ 'namespace': 'alt', 'storages': ['local', 'memory']});
 ```
 
 ## Configuration

@@ -73,8 +73,8 @@ basil = new window.Basil(options);
 basil.set('hello', 'world');
 
 // store data under a given namespace
-basil.set('hello', 42, { 'namespace': 'alt' });
-basil.set('abc', 'def', { 'namespace': 'alt', 'storages': ['memory'] });
+basil.set('hello', 42, { 'namespace': 'alt' });
+basil.set('abc', 'def', { 'namespace': 'alt', 'storages': ['memory'] });
 
 // retrieve data
 basil.get('hello'); // return 'world'
@@ -89,12 +89,12 @@ basil.keysMap(); // returns { 'hello': ['local'] }
 basil.keysMap({ 'namespace': 'alt' }); // returns { 'hello': ['local'], 'abc': ['memory'] }
 
 // remove data under a given namespace
-basil.remove('hello', { 'namespace': 'alt' });
+basil.remove('hello', { 'namespace': 'alt' });
 basil.get('hello'); // return 'world'
 basil.get('hello', { 'namespace': 'alt' }); // return null
 
 // reset data under a given namespace
-basil.reset({ 'namespace': 'alt', 'storages': ['local', 'memory']});
+basil.reset({ 'namespace': 'alt', 'storages': ['local', 'memory']});
 ```
 
 ## Configuration

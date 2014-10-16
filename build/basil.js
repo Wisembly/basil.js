@@ -303,7 +303,7 @@
 					storageKeys = _storages[storage].keys(namespace);
 					for (var j = 0, key; j < storageKeys.length; j++) {
 						key = storageKeys[j];
-						map[key] = map[key] instanceof Array ? map[key] : [];
+						map[key] = map[key] || [];
 						map[key].push(storage);
 					}
 				}

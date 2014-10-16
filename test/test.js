@@ -40,13 +40,13 @@
 			var data = {
 					str: 'hello world',
 					nb: 42,
-					obj: { foo: 'bar', baz: 'quux' },
+					obj: { foo: 'bar', baz: 'quux' },
 					arr: ['foo', 42, 'bar']
 				},
 				alt = {
 					str: 'foobar',
 					nb: -1,
-					obj: { hello: 'world', foo: 'bar' },
+					obj: { hello: 'world', foo: 'bar' },
 					arr: ['quux', -1, 'baz']
 				};
 
@@ -61,7 +61,7 @@
 				var basil = new window.Basil();
 				for (var key in alt) {
 					basil.set(key, alt[key], { namespace: 'alt' });
-					expect(basil.get(key, { namespace: 'alt' })).to.eql(alt[key]);
+					expect(basil.get(key, { namespace: 'alt' })).to.eql(alt[key]);
 					expect(basil.get(key)).to.eql(data[key]);
 				}
 			});
@@ -135,9 +135,9 @@
 				});
 				expect(basil.keys({ namespace: 'third' })).to.eql([]);
 				expect(basil.keysMap({ namespace: 'third' })).to.eql({});
-				basil.reset({ namespace: 'first' });
-				basil.reset({ namespace: 'second' });
-				basil.reset({ namespace: 'third' });
+				basil.reset({ namespace: 'first' });
+				basil.reset({ namespace: 'second' });
+				basil.reset({ namespace: 'third' });
 			});
 		});
 

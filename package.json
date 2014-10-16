@@ -21,5 +21,8 @@
         "gulp": "*",
         "gulp-uglify": "*",
         "gulp-rename": "*"
+    },
+    "spm": {
+        "main": "src/basil.js"
     }
 }

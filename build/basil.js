@@ -5,7 +5,7 @@
 	};
 
 	// Version
-	Basil.version = '0.3.3';
+	Basil.version = '0.3.4';
 
 	// Utils
 	Basil.utils = {
@@ -17,6 +17,9 @@
 						destination[property] = arguments[i][property];
 			}
 			return destination;
+		},
+		isArray: function (obj) {
+			return Object.prototype.toString.call(obj) === '[object Array]';
 		},
 		registerPlugin: function (methods) {
 			Basil.plugins = this.extend(methods, Basil.plugins);
@@ -42,13 +45,13 @@
 			_toStoragesArray = function (storages) {
 				if (!storages)
 					return null;
-				return Object.prototype.toString.call(storages) === '[object Array]' ? storages : [storages];
+				return Basil.utils.isArray(storages) ? storages : [storages];
 			},
 			_toStoredKey = function (namespace, name) {
 				var key = '';
 				if (typeof name === 'string')
 					key = namespace + ':' + name;
-				else if (name instanceof Array) {
+				else if (Basil.utils.isArray(name)) {
 					key = namespace;
 					for (var i = 0; i < name.length; i++)
 						if (name[i])
@@ -57,7 +60,9 @@
 				return key;
 			},
 			_toKeyName = function (namespace, name) {
-				return name.replace(namespace + ':', '');
+				if (!namespace)
+					return name;
+				return name.replace(new RegExp('^' + namespace + ':'), '');
 			},
 			_toStoredValue = function (value) {
 				return JSON.stringify(value);
@@ -67,7 +72,7 @@
 			};
 
 		// local storage
-		_storages['local'] = {
+		_storages.local = {
 			engine: window.localStorage,
 			check: function () {
 				try {
@@ -92,7 +97,7 @@
 			reset: function (namespace) {
 				for (var i = 0, key; i < this.engine.length; i++) {
 					key = this.engine.key(i);
-					if (key.indexOf(namespace) === 0) {
+					if (!namespace || key.indexOf(namespace) === 0) {
 						this.remove(key);
 						i--;
 					}
@@ -102,7 +107,7 @@
 				var keys = [];
 				for (var i = 0, key; i < this.engine.length; i++) {
 					key = this.engine.key(i);
-					if (key.indexOf(namespace) === 0)
+					if (!namespace || key.indexOf(namespace) === 0)
 						keys.push(_toKeyName(namespace, key));
 				}
 				return keys;
@@ -110,12 +115,12 @@
 		};
 
 		// session storage
-		_storages['session'] = Basil.utils.extend({}, _storages['local'], {
+		_storages.session = Basil.utils.extend({}, _storages.local, {
 			engine: window.sessionStorage
 		});
 
 		// memory storage
-		_storages['memory'] = {
+		_storages.memory = {
 			_hash: {},
 			check: function () {
 				return true;
@@ -133,21 +138,21 @@
 			},
 			reset: function (namespace) {
 				for (var key in this._hash) {
-					if (key.indexOf(namespace) === 0)
+					if (!namespace || key.indexOf(namespace) === 0)
 						this.remove(key);
 				}
 			},
 			keys: function (namespace) {
 				var keys = [];
 				for (var key in this._hash)
-					if (key.indexOf(namespace) === 0)
+					if (!namespace || key.indexOf(namespace) === 0)
 						keys.push(_toKeyName(namespace, key));
 				return keys;
 			}
 		};
 
 		// cookie storage
-		_storages['cookie'] = {
+		_storages.cookie = {
 			check: function () {
 				return navigator.cookieEnabled;
 			},
@@ -167,8 +172,8 @@
 			},
 			get: function (name) {
 				var cookies = document.cookie.split(';');
-				for (var i = 0; i < cookies.length; i++) {
-					var cookie = cookies[i].replace(/^\s*/, '');
+				for (var i = 0, cookie; i < cookies.length; i++) {
+					cookie = cookies[i].replace(/^\s*/, '');
 					if (cookie.indexOf(name + '=') === 0)
 						return cookie.substring(name.length + 1, cookie.length);
 				}
@@ -187,20 +192,20 @@
 			},
 			reset: function (namespace) {
 				var cookies = document.cookie.split(';');
-				for (var i = 0; i < cookies.length; i++) {
-					var cookie = cookies[i].replace(/^\s*/, ''),
-						key = cookie.substr(0, cookie.indexOf('='));
-					if (key.indexOf(namespace) === 0)
+				for (var i = 0, cookie, key; i < cookies.length; i++) {
+					cookie = cookies[i].replace(/^\s*/, '');
+					key = cookie.substr(0, cookie.indexOf('='));
+					if (!namespace || key.indexOf(namespace) === 0)
 						this.remove(key);
 				}
 			},
 			keys: function (namespace) {
 				var keys = [],
 					cookies = document.cookie.split(';');
-				for (var i = 0; i < cookies.length; i++) {
-					var cookie = cookies[i].replace(/^\s*/, ''),
-						key = cookie.substr(0, cookie.indexOf('='));
-					if (key.indexOf(namespace) === 0)
+				for (var i = 0, cookie, key; i < cookies.length; i++) {
+					cookie = cookies[i].replace(/^\s*/, '');
+					key = cookie.substr(0, cookie.indexOf('='));
+					if (!namespace || key.indexOf(namespace) === 0)
 						keys.push(_toKeyName(namespace, key));
 				}
 				return keys;
@@ -303,13 +308,14 @@
 					storageKeys = _storages[storage].keys(namespace);
 					for (var j = 0, key; j < storageKeys.length; j++) {
 						key = storageKeys[j];
-						map[key] = map[key] || [];
+						map[key] = map[key] instanceof Array ? map[key] : [];
 						map[key].push(storage);
 					}
 				}
 				return map;
 			},
 			// Access to native storages, without namespace or basil value decoration
+			memory: _storages.memory,
 			cookie: _storages.cookie,
 			localStorage: _storages.local,
 			sessionStorage: _storages.session

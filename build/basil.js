@@ -5,7 +5,7 @@
 	};
 
 	// Version
-	Basil.version = '0.3.4';
+	Basil.version = '0.4.0';
 
 	// Utils
 	Basil.utils = {
@@ -18,20 +18,45 @@
 			}
 			return destination;
 		},
-		isArray: function (obj) {
-			return Object.prototype.toString.call(obj) === '[object Array]';
+		each: function (obj, fnIterator, context) {
+			if (this.isArray(obj)) {
+				for (var i = 0; i < obj.length; i++)
+					if (fnIterator.call(context, obj[i], i) === false) return;
+			} else if (obj) {
+				for (var key in obj)
+					if (fnIterator.call(context, obj[key], key) === false) return;
+			}
+		},
+		tryEach: function (obj, fnIterator, fnError, context) {
+			this.each(obj, function (value, key) {
+				try {
+					return fnIterator.call(context, value, key);
+				} catch (error) {
+					if (this.isFunction(fnError))
+						fnError.call(context, value, key, error);
+				}
+			}, this);
 		},
 		registerPlugin: function (methods) {
 			Basil.plugins = this.extend(methods, Basil.plugins);
 		}
 	};
+  	// Add some isType methods: isArguments, isBoolean, isFunction, isString, isArray, isNumber, isDate, isRegExp.
+	var types = ['Arguments', 'Boolean', 'Function', 'String', 'Array', 'Number', 'Date', 'RegExp']
+	for (var i = 0; i < types.length; i++) {
+		Basil.utils['is' + types[i]] = (function (type) {
+			return function (obj) {
+				return Object.prototype.toString.call(obj) === '[object ' + type + ']';
+			};
+		})(types[i]);
+	}
 
+	// Plugins
 	Basil.plugins = {};
 
 	// Options
 	Basil.options = Basil.utils.extend({
 		namespace: 'b45i1',
-		storage: null,
 		storages: ['local', 'cookie', 'session', 'memory'],
 		expireDays: 365
 	}, window.Basil ? window.Basil.options : {});
@@ -43,21 +68,17 @@
 				.substring(7),
 			_storages = {},
 			_toStoragesArray = function (storages) {
-				if (!storages)
-					return null;
-				return Basil.utils.isArray(storages) ? storages : [storages];
+				if (Basil.utils.isArray(storages))
+					return storages;
+				return Basil.utils.isString(storages) ? [storages] : [];
 			},
-			_toStoredKey = function (namespace, name) {
+			_toStoredKey = function (namespace, path) {
 				var key = '';
-				if (typeof name === 'string')
-					key = namespace + ':' + name;
-				else if (Basil.utils.isArray(name)) {
-					key = namespace;
-					for (var i = 0; i < name.length; i++)
-						if (name[i])
-							key += ':' + name[i];
-				}
-				return key;
+				if (Basil.utils.isString(path) && path.length)
+					path = [path];
+				if (Basil.utils.isArray(path) && path.length)
+					key = path.join(':');
+				return key && namespace ? namespace + ':' + key : key;
 			},
 			_toKeyName = function (namespace, name) {
 				if (!namespace)
@@ -157,10 +178,12 @@
 				return navigator.cookieEnabled;
 			},
 			set: function (name, value, options) {
+				options = options || {};
 				if (!name)
 					return;
-				options = options || {};
+
 				var cookie = name + '=' + value;
+
 				if (options.expireDays) {
 					var date = new Date();
 					date.setTime(date.getTime() + (options.expireDays * 24 * 60 * 60 * 1000));
@@ -184,6 +207,7 @@
 					return;
 				// remove cookie from main domain
 				this.set(name, '', { expireDays: -1 });
+
 				// remove cookie from upper domains
 				var domainParts = document.domain.split('.');
 				for (var i = domainParts.length - 1; i > 0; i--) {
@@ -214,80 +238,63 @@
 
 		return {
 			init: function (options) {
-				this.options = Basil.utils.extend({}, Basil.options, options);
-				this.supportedStorages = {};
-				for (var i = 0, storage; i < this.options.storages.length; i++) {
-					storage = this.options.storages[i];
-					if (_storages.hasOwnProperty(storage))
-						this.supportedStorages[storage] = _storages[storage];
-				}
-				this.defaultStorage = this.check(this.options.storage) ? this.options.storage : this.detect();
+				this.setOptions(options);
 				return this;
 			},
-			detect: function () {
-				for (var storage in this.supportedStorages)
-					if (this.check(storage))
-						return storage;
-				return null;
+			setOptions: function (options) {
+				this.options = Basil.utils.extend({}, this.options || Basil.options, options);
+			},
+			support: function (storage) {
+				return _storages.hasOwnProperty(storage);
 			},
 			check: function (storage) {
-				storage = storage || this.defaultStorage;
-				if (this.supportedStorages.hasOwnProperty(storage))
-					return this.supportedStorages[storage].check();
+				if (this.support(storage))
+					return _storages[storage].check();
 				return false;
 			},
 			set: function (name, value, options) {
-				options = options || {};
-				if (!(name = _toStoredKey(options.namespace || this.options.namespace, name)))
+				options = Basil.utils.extend({}, this.options, options);
+				if (!(name = _toStoredKey(options.namespace, name)))
 					return;
 				value = _toStoredValue(value);
-				options = Basil.utils.extend({
-					expireDays: this.options.expireDays
-				}, options);
-				var storages = _toStoragesArray(options.storages) || [this.defaultStorage];
-				for (var i = 0, storage; i < storages.length; i++) {
-					storage = storages[i];
-					if (!this.check(storage))
-						continue;
+				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
 					_storages[storage].set(name, value, options);
-				}
+					return false; // break;
+				}, function (storage, index, error) {
+					if (this.support(storage))
+						_storages[storage].remove(name);
+				}, this);
 			},
 			get: function (name, options) {
-				options = options || {};
-				if (!(name = _toStoredKey(options.namespace || this.options.namespace, name)))
+				options = Basil.utils.extend({}, this.options, options);
+				if (!(name = _toStoredKey(options.namespace, name)))
 					return null;
-				var value = null,
-					storages = _toStoragesArray(options.storages) || [this.defaultStorage];
-				for (var i = 0, storage; value === null && i < storages.length; i++) {
-					storage = storages[i];
-					if (!this.check(storage))
-						continue;
-					value = _fromStoredValue(_storages[storage].get(name));
-				}
+				var value = null;
+				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
+					if (value !== null)
+						return false; // break
+					if (this.support(storage))
+						value = _fromStoredValue(_storages[storage].get(name, options));
+				}, function (storage, index, error) {
+					value = _storages[storage].get(name, options) || null;
+				}, this);
 				return value;
 			},
 			remove: function (name, options) {
-				options = options || {};
-				if (!(name = _toStoredKey(options.namespace || this.options.namespace, name)))
+				options = Basil.utils.extend({}, this.options, options);
+				if (!(name = _toStoredKey(options.namespace, name)))
 					return null;
-				var storages = _toStoragesArray(options.storages) || [this.defaultStorage];
-				for (var i = 0, storage; i < storages.length; i++) {
-					storage = storages[i];
-					if (!this.check(storage))
-						continue;
-					_storages[storage].remove(name);
-				}
+				Basil.utils.each(_toStoragesArray(options.storages), function (storage) {
+					if (this.support(storage))
+						_storages[storage].remove(name);
+				}, this);
 			},
 			reset: function (options) {
-				options = options || {};
-				var storages = _toStoragesArray(options.storages) || [this.defaultStorage],
-					namespace = options.namespace || this.options.namespace;
-				for (var i = 0, storage; i < storages.length; i++) {
-					storage = storages[i];
-					if (!this.check(storage))
-						continue;
-					_storages[storage].reset(namespace);
-				}
+				options = Basil.utils.extend({}, this.options, options);
+				Basil.utils.each(_toStoragesArray(options.storages), function (storage) {
+					if (this.support(storage))
+						_storages[storage].reset(options.namespace);
+				}, this);
 			},
 			keys: function (options) {
 				options = options || {};
@@ -297,21 +304,16 @@
 				return keys;
 			},
 			keysMap: function (options) {
-				options = options || {};
-				var map = {},
-					storages = _toStoragesArray(options.storages) || this.options.storages,
-					namespace = options.namespace || this.options.namespace;
-				for (var i = 0, storage, storageKeys; i < storages.length; i++) {
-					storage = storages[i];
-					if (!this.check(storage))
-						continue;
-					storageKeys = _storages[storage].keys(namespace);
-					for (var j = 0, key; j < storageKeys.length; j++) {
-						key = storageKeys[j];
-						map[key] = map[key] instanceof Array ? map[key] : [];
+				options = Basil.utils.extend({}, this.options, options);
+				var map = {};
+				Basil.utils.each(_toStoragesArray(options.storages), function (storage) {
+					if (!this.support(storage))
+						return true; // continue
+					Basil.utils.each(_storages[storage].keys(options.namespace), function (key) {
+						map[key] = Basil.utils.isArray(map[key]) ? map[key] : [];
 						map[key].push(storage);
-					}
-				}
+					}, this);
+				}, this);
 				return map;
 			},
 			// Access to native storages, without namespace or basil value decoration

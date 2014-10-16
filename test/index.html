@@ -5,12 +5,21 @@
 		<![endif]-->
 		<script src='../src/basil.js'></script>
 		<script src='../src/basil.list.js'></script>
-                <script src='../src/basil.set.js'></script>
-		<script>
-			window.basil = new Basil();
-		</script>
+		<script src='../src/basil.set.js'></script>
 	</head>
 	<body>
 		<h1>Welcome to Basil</h1>
+		<script>
+			window.basil = new Basil();
+			var map = window.basil.keysMap({ namespace: null });
+			Basil.utils.each(map, function (storages, key) {
+				document.write('<b>' + key + '</b><br />');
+				Basil.utils.each(storages, function (storage) {
+					var value = window.basil.get(key, { namespace: null, storages: [storage] });
+					document.write(storage + ': [' + typeof value + ']: ' + JSON.stringify(value) + '<br />');
+				}, this);
+				document.write('-----------------<br />');
+			}, this);
+		</script>
 	</body>
 </html>

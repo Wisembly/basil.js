@@ -19,7 +19,7 @@ basil.remove('foo'); // remove 'foo' value
 
 // advanced methods
 basil.check('local'); // boolean. Test if localStorage is available
-basil.reset(); // reset all stored values under namespace for current storage
+basil.reset(); // reset all stored values under namespace
 ```
 
 
@@ -34,8 +34,9 @@ basil = new window.Basil(options);
 // set 'bar' value under 'foo' key in localStorage
 basil.set('foo', 'bar', { 'storages': ['local'] });
 
-// set 'bar' value under 'foo' key in localStorage AND cookie
-basil.set('foo', 'bar', { 'storages': ['local', 'cookie'] });
+// set 'bar' value under 'foo' key.
+// try first to store it into cookies and if not possible into localStorage
+basil.set('foo', 'quux', { 'storages': ['cookie', 'local'] });
 
 // set 'xyz' value under 'abc' key in memory
 basil.set('abc', 'xyz', { 'storages': ['memory'] });
@@ -44,7 +45,7 @@ basil.set('abc', 'xyz', { 'storages': ['memory'] });
 basil.keys(); // returns ['foo', 'abc']
 basic.keys({ 'storages': ['memory'] }); // returns ['abc']
 
-// retrive keys map
+// retrieve keys map
 basil.keysMap(); // returns { 'foo': ['local', 'cookie'], 'abc': ['memory'] }
 basic.keysMap({ 'storages': ['memory'] }); // returns { 'abc': ['memory'] }
 
@@ -110,10 +111,6 @@ options = {
   // storages. Specify all Basil supported storages and priority order
   // default: `['local', 'cookie', 'session', 'memory']`
   storages: ['cookie', 'local']
-
-  // storage. Specify the default storage to use
-  // default: detect best available storage among the supported ones
-  storage: 'cookie'
 
   // expireDays. Default number of days before cookies expiration
   // default: 365

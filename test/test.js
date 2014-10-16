@@ -10,15 +10,20 @@
 			});
 			it('should have a valid unified API', function () {
 				var basil = new window.Basil();
-				expect(basil.detect).to.be.a('function');
+				expect(basil.init).to.be.a('function');
+				expect(basil.setOptions).to.be.a('function');
+				expect(basil.support).to.be.a('function');
 				expect(basil.check).to.be.a('function');
 				expect(basil.get).to.be.a('function');
 				expect(basil.set).to.be.a('function');
 				expect(basil.remove).to.be.a('function');
 				expect(basil.reset).to.be.a('function');
+				expect(basil.keys).to.be.a('function');
+				expect(basil.keysMap).to.be.a('function');
 			});
 			it('should allow access to native storages', function () {
 				var basil = new window.Basil();
+				expect(basil.memory).to.be.an('object');
 				expect(basil.cookie).to.be.an('object');
 				expect(basil.localStorage).to.be.an('object');
 				expect(basil.sessionStorage).to.be.an('object');
@@ -27,12 +32,12 @@
 
 		describe('Options handling', function () {
 			it('should handle storages option', function () {
-				var basil = new window.Basil({storages: ['cookie']});
-				expect(basil.supportedStorages).to.have.key(['cookie']);
+				var basil = new window.Basil({ storages: ['cookie'] });
+				expect(basil.options.storages).to.eql(['cookie']);
 			});
-			it('should handle storage option', function () {
-				var basil = new window.Basil({storages: ['cookie']});
-				expect(basil.defaultStorage).to.be('cookie');
+			it('should handle namespace option', function () {
+				var basil = new window.Basil({ namespace: 'foo' });
+				expect(basil.options.namespace).to.be('foo');
 			});
 		});
 
@@ -110,7 +115,7 @@
 				expect(basil.keys()).to.eql(['foo', 'bar', 'baz']);
 				expect(basil.keysMap()).to.eql({
 					'foo': ['local', 'session'],
-					'bar': ['cookie', 'session'],
+					'bar': ['cookie'],
 					'baz': ['session']
 				});
 				basil.reset();
@@ -130,7 +135,7 @@
 				});
 				expect(basil.keys({ namespace: 'second' })).to.eql(['bar', 'baz']);
 				expect(basil.keysMap({ namespace: 'second' })).to.eql({
-					'bar': ['cookie', 'session'],
+					'bar': ['cookie'],
 					'baz': ['session']
 				});
 				expect(basil.keys({ namespace: 'third' })).to.eql([]);

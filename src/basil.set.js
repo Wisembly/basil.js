@@ -9,7 +9,7 @@
 }(function (Basil) {
 
 	var BasilSet = function () {
-		var _indexOf = function(array, item) {
+		var _indexOf = function (array, item) {
 
 			for (var i = 0, length = array.length; i < length; i++) {
 				if (array[i] === item)
@@ -21,15 +21,12 @@
 		_contains = function (array, item) {
 			return _indexOf(array, item) >= 0;
 		},
-		_isArray = function(arg) {
-			return Object.prototype.toString.call(arg) === '[object Array]';
-		},
 		//http://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array-in-javascript
 		_shuffle = function (o){
-			for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+			for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
 			return o;
 		},
-		_union = function() {
+		_union = function () {
 			var args = arguments[0],
 				allElements = [],
 				uniqElements = [];
@@ -43,7 +40,7 @@
 
 			return uniqElements;
 		},
-		_difference = function() {
+		_difference = function () {
 			arguments = arguments[0];
 			var firstArray = arguments[0], otherArrays = [], diffArray = [];
 			for (var i = 1, length = arguments.length; i < length; i++) {
@@ -58,7 +55,7 @@
 
 			return diffArray;
 		},
-		_intersection = function() {
+		_intersection = function () {
 			arguments = arguments[0];
 			var result = [], firstArray = arguments[0],
 				argsLength = arguments.length;
@@ -86,7 +83,7 @@
 			sadd: function (key, members) {
 				var set = this.get(key) || [], addedItems = 0;
 
-				if (!_isArray(members)) {
+				if (!Basil.utils.isArray(members)) {
 					members = [members];
 				} //Accept array or single.
 
@@ -242,7 +239,7 @@
 					return 0;
 				}
 
-				if (!_isArray(members)) {
+				if (!Basil.utils.isArray(members)) {
 					members = [members];
 				} //Accept array or single.
 
@@ -273,8 +270,8 @@
 					args.push(this.smembers(arguments[i]));
 				}
 				var union = _union(args);
-					this.set(key, union);
-					return union.length;
+				this.set(key, union);
+				return union.length;
 			},
 			sscan: function () {
 				throw new Error('not implemented yet');

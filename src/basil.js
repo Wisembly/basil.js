@@ -32,8 +32,11 @@
 				try {
 					return fnIterator.call(context, value, key);
 				} catch (error) {
-					if (this.isFunction(fnError))
-						fnError.call(context, value, key, error);
+					if (this.isFunction(fnError)) {
+						try {
+							fnError.call(context, value, key, error);
+						} catch (error) {}
+					}
 				}
 			}, this);
 		},
@@ -92,13 +95,13 @@
 				return JSON.parse(value);
 			};
 
-		// local storage
-		_storages.local = {
-			engine: window.localStorage,
+		// HTML5 web storage interface
+		var webStorageInterface = {
+			engine: null,
 			check: function () {
 				try {
-					this.engine.setItem(_salt, true);
-					this.engine.removeItem(_salt);
+					window[this.engine].setItem(_salt, true);
+					window[this.engine].removeItem(_salt);
 				} catch (e) {
 					return false;
 				}
@@ -107,17 +110,17 @@
 			set: function (name, value, options) {
 				if (!name)
 					return;
-				this.engine.setItem(name, value);
+				window[this.engine].setItem(name, value);
 			},
 			get: function (name) {
-				return this.engine.getItem(name);
+				return window[this.engine].getItem(name);
 			},
 			remove: function (name) {
-				this.engine.removeItem(name);
+				window[this.engine].removeItem(name);
 			},
 			reset: function (namespace) {
-				for (var i = 0, key; i < this.engine.length; i++) {
-					key = this.engine.key(i);
+				for (var i = 0, key; i < window[this.engine].length; i++) {
+					key = window[this.engine].key(i);
 					if (!namespace || key.indexOf(namespace) === 0) {
 						this.remove(key);
 						i--;
@@ -126,8 +129,8 @@
 			},
 			keys: function (namespace) {
 				var keys = [];
-				for (var i = 0, key; i < this.engine.length; i++) {
-					key = this.engine.key(i);
+				for (var i = 0, key; i < window[this.engine].length; i++) {
+					key = window[this.engine].key(i);
 					if (!namespace || key.indexOf(namespace) === 0)
 						keys.push(_toKeyName(namespace, key));
 				}
@@ -135,9 +138,13 @@
 			}
 		};
 
+		// local storage
+		_storages.local = Basil.utils.extend({}, webStorageInterface, {
+			engine: 'localStorage'
+		});
 		// session storage
-		_storages.session = Basil.utils.extend({}, _storages.local, {
-			engine: window.sessionStorage
+		_storages.session = Basil.utils.extend({}, webStorageInterface, {
+			engine: 'sessionStorage'
 		});
 
 		// memory storage
@@ -178,12 +185,12 @@
 				return navigator.cookieEnabled;
 			},
 			set: function (name, value, options) {
+				if (!this.check())
+					throw 'SecurityError: cookies are disabled';
 				options = options || {};
 				if (!name)
 					return;
-
 				var cookie = name + '=' + value;
-
 				if (options.expireDays) {
 					var date = new Date();
 					date.setTime(date.getTime() + (options.expireDays * 24 * 60 * 60 * 1000));
@@ -194,7 +201,9 @@
 				document.cookie = cookie + '; path=/';
 			},
 			get: function (name) {
-				var cookies = document.cookie.split(';');
+				if (!this.check())
+					throw 'SecurityError: cookies are disabled';
+				var cookies = document.cookie ? document.cookie.split(';') : [];
 				for (var i = 0, cookie; i < cookies.length; i++) {
 					cookie = cookies[i].replace(/^\s*/, '');
 					if (cookie.indexOf(name + '=') === 0)
@@ -203,6 +212,8 @@
 				return null;
 			},
 			remove: function (name) {
+				if (!this.check())
+					throw 'SecurityError: cookies are disabled';
 				if (!name)
 					return;
 				// remove cookie from main domain
@@ -215,7 +226,9 @@
 				}
 			},
 			reset: function (namespace) {
-				var cookies = document.cookie.split(';');
+				if (!this.check())
+					throw 'SecurityError: cookies are disabled';
+				var cookies = document.cookie ? document.cookie.split(';') : [];
 				for (var i = 0, cookie, key; i < cookies.length; i++) {
 					cookie = cookies[i].replace(/^\s*/, '');
 					key = cookie.substr(0, cookie.indexOf('='));
@@ -224,8 +237,10 @@
 				}
 			},
 			keys: function (namespace) {
+				if (!this.check())
+					throw 'SecurityError: cookies are disabled';
 				var keys = [],
-					cookies = document.cookie.split(';');
+					cookies = document.cookie ? document.cookie.split(';') : [];
 				for (var i = 0, cookie, key; i < cookies.length; i++) {
 					cookie = cookies[i].replace(/^\s*/, '');
 					key = cookie.substr(0, cookie.indexOf('='));
@@ -284,17 +299,17 @@
 				options = Basil.utils.extend({}, this.options, options);
 				if (!(name = _toStoredKey(options.namespace, name)))
 					return null;
-				Basil.utils.each(_toStoragesArray(options.storages), function (storage) {
+				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
 					if (this.support(storage))
 						_storages[storage].remove(name);
-				}, this);
+				}, null, this);
 			},
 			reset: function (options) {
 				options = Basil.utils.extend({}, this.options, options);
-				Basil.utils.each(_toStoragesArray(options.storages), function (storage) {
+				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
 					if (this.support(storage))
 						_storages[storage].reset(options.namespace);
-				}, this);
+				}, null, this);
 			},
 			keys: function (options) {
 				options = options || {};
@@ -306,14 +321,14 @@
 			keysMap: function (options) {
 				options = Basil.utils.extend({}, this.options, options);
 				var map = {};
-				Basil.utils.each(_toStoragesArray(options.storages), function (storage) {
+				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
 					if (!this.support(storage))
 						return true; // continue
 					Basil.utils.each(_storages[storage].keys(options.namespace), function (key) {
 						map[key] = Basil.utils.isArray(map[key]) ? map[key] : [];
 						map[key].push(storage);
 					}, this);
-				}, this);
+				}, null, this);
 				return map;
 			},
 			// Access to native storages, without namespace or basil value decoration

@@ -48,21 +48,24 @@ basic.keys({ 'storages': ['memory'] }); // returns ['abc']
 // retrieve keys map
 basil.keysMap(); // returns { 'foo': ['local', 'cookie'], 'abc': ['memory'] }
 basic.keysMap({ 'storages': ['memory'] }); // returns { 'abc': ['memory'] }
+```
 
+### Native storages
+```
 // Access native storages
 // With basil API, but without namespace nor JSON parsing for values
 
 // cookies
-basil.cookie.get(key);
-basil.cookie.set(key, value, { 'expireDays': days, 'domain': 'mydomain.com' });
+Basil.cookie.get(key);
+Basil.cookie.set(key, value, { 'expireDays': days, 'domain': 'mydomain.com' });
 
 // localStorage
-basil.localStorage.get(key);
-basil.localStorage.set(key, value);
+Basil.localStorage.get(key);
+Basil.localStorage.set(key, value);
 
 // sessionStorage
-basil.sessionStorage.get(key);
-basil.sessionStorage.set(key, value);
+Basil.sessionStorage.get(key);
+Basil.sessionStorage.set(key, value);
 ```
 
 ### Namespaces

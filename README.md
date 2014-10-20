@@ -4,6 +4,17 @@ The missing Javascript smart persistence layer.
 Unified localstorage, cookie and session storage JavaScript API.
 
 
+## Philosophy
+
+Basil aims to ease the frontend storage management for developpers. It strive
+to be bulletproof and handle for you disabled cookies, full localStorage,
+unwanted native storage exceptions..
+
+When you'll try to store something, basil will automaticall seek through all
+the available storages and find the best suited one to store your value. It
+also handle for you the storage of complex javascript objects using json.
+
+
 ## Basic Usage
 
 ```javascript
@@ -22,7 +33,6 @@ basil.check('local'); // boolean. Test if localStorage is available
 basil.reset(); // reset all stored values under namespace
 ```
 
-
 ## Advanced Usage
 
 ### Storages
@@ -40,6 +50,9 @@ basil.set('foo', 'quux', { 'storages': ['cookie', 'local'] });
 
 // set 'xyz' value under 'abc' key in memory
 basil.set('abc', 'xyz', { 'storages': ['memory'] });
+
+// set value without JSON encoding
+basil.set('foo', '{ "bar": "baz" }', { raw: true }); // will save { "bar": "baz" } as string
 
 // retrieve keys
 basil.keys(); // returns ['foo', 'abc']

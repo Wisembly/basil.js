@@ -16,7 +16,12 @@
 				document.write('<b>' + key + '</b><br />');
 				Basil.utils.each(storages, function (storage) {
 					var value = window.basil.get(key, { namespace: null, storages: [storage] });
-					document.write(storage + ': [' + typeof value + ']: ' + JSON.stringify(value) + '<br />');
+					if (value) {
+						document.write(storage + ': [' + typeof value + ']: ' + JSON.stringify(value) + '<br />');
+					} else {
+						value = window.basil.get(key, { namespace: null, storages: [storage], raw: true });
+						document.write(storage + ': [Invalid raw data]: ' + JSON.stringify(value) + '<br />');
+					}
 				}, this);
 				document.write('-----------------<br />');
 			}, this);

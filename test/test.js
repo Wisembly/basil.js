@@ -22,11 +22,10 @@
 				expect(basil.keysMap).to.be.a('function');
 			});
 			it('should allow access to native storages', function () {
-				var basil = new window.Basil();
-				expect(basil.memory).to.be.an('object');
-				expect(basil.cookie).to.be.an('object');
-				expect(basil.localStorage).to.be.an('object');
-				expect(basil.sessionStorage).to.be.an('object');
+				expect(Basil.memory).to.be.an('object');
+				expect(Basil.cookie).to.be.an('object');
+				expect(Basil.localStorage).to.be.an('object');
+				expect(Basil.sessionStorage).to.be.an('object');
 			});
 		});
 
@@ -146,40 +145,37 @@
 			});
 		});
 
-		if (new window.Basil().localStorage.check()) {
+		if (window.Basil.localStorage.check()) {
 			describe('localStorage', function () {
 				var _engine = {
 					setItem: function () {},
 					removeItem: function () {}
 				};
 				it('should have check() method returning true if localStorage available', function () {
-					expect(new window.Basil().localStorage.check()).to.be(true);
+					expect(window.Basil.localStorage.check()).to.be(true);
 				});
 				it('should have check() method returning false if localStorage not available 1/2', function () {
-					var basil = new window.Basil(),
-						stub = sinon.stub(_engine, 'setItem');
+					var stub = sinon.stub(_engine, 'setItem');
 					stub.throws();
-					basil.localStorage.engine = _engine;
-					expect(basil.localStorage.check()).to.be(false);
+					Basil.localStorage.engine = _engine;
+					expect(Basil.localStorage.check()).to.be(false);
 					stub.restore();
 				});
 				it('should have check() method returning false if localStorage not available 2/2', function () {
-					var basil = new window.Basil(),
-						stub = sinon.stub(_engine, 'removeItem');
+					var stub = sinon.stub(_engine, 'removeItem');
 					stub.throws();
-					basil.localStorage.engine = _engine;
-					expect(basil.localStorage.check()).to.be(false);
+					Basil.localStorage.engine = _engine;
+					expect(Basil.localStorage.check()).to.be(false);
 					stub.restore();
 				});
 				it('should have set() method storing properly items and values 1/2', function () {
-					var basil = new window.Basil(),
-						stub = sinon.stub(_engine, 'setItem');
-					basil.localStorage.set('foo', 'bar');
+					var stub = sinon.stub(_engine, 'setItem');
+					Basil.localStorage.set('foo', 'bar');
 					expect(stub.calledWith('foo', 'bar'));
 					stub.restore();
 				});
 				it('should have set() method storing properly items and values 2/2', function () {
-					expect(new Basil().localStorage.set()).to.be(undefined);
+					expect(Basil.localStorage.set()).to.be(undefined);
 				});
 			});
 		} else {

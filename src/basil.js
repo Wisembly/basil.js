@@ -92,7 +92,7 @@
 				return JSON.stringify(value);
 			},
 			_fromStoredValue = function (value) {
-				return JSON.parse(value);
+				return value ? JSON.parse(value) : null;
 			};
 
 		// HTML5 web storage interface

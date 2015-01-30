@@ -1,7 +1,7 @@
 (function () {
 	// Basil
 	var Basil = function (options) {
-		return Basil.utils.extend(Basil.plugins, new Basil.Storage().init(options));
+		return Basil.utils.extend({}, Basil.plugins, new Basil.Storage().init(options));
 	};
 
 	// Version
@@ -83,16 +83,16 @@
 					key = path.join(':');
 				return key && namespace ? namespace + ':' + key : key;
 			},
-			_toKeyName = function (namespace, name) {
+			_toKeyName = function (namespace, key) {
 				if (!namespace)
-					return name;
-				return name.replace(new RegExp('^' + namespace + ':'), '');
+					return key;
+				return key.replace(new RegExp('^' + namespace + ':'), '');
 			},
 			_toStoredValue = function (value) {
 				return JSON.stringify(value);
 			},
 			_fromStoredValue = function (value) {
-				return JSON.parse(value);
+				return value ? JSON.parse(value) : null;
 			};
 
 		// HTML5 web storage interface
@@ -107,16 +107,16 @@
 				}
 				return true;
 			},
-			set: function (name, value, options) {
-				if (!name)
-					return;
-				window[this.engine].setItem(name, value);
+			set: function (key, value, options) {
+				if (!key)
+					throw Error('invalid key');
+				window[this.engine].setItem(key, value);
 			},
-			get: function (name) {
-				return window[this.engine].getItem(name);
+			get: function (key) {
+				return window[this.engine].getItem(key);
 			},
-			remove: function (name) {
-				window[this.engine].removeItem(name);
+			remove: function (key) {
+				window[this.engine].removeItem(key);
 			},
 			reset: function (namespace) {
 				for (var i = 0, key; i < window[this.engine].length; i++) {
@@ -153,16 +153,16 @@
 			check: function () {
 				return true;
 			},
-			set: function (name, value, options) {
-				if (!name)
-					return;
-				this._hash[name] = value;
+			set: function (key, value, options) {
+				if (!key)
+					throw Error('invalid key');
+				this._hash[key] = value;
 			},
-			get: function (name) {
-				return this._hash[name] || null;
+			get: function (key) {
+				return this._hash[key] || null;
 			},
-			remove: function (name) {
-				delete this._hash[name];
+			remove: function (key) {
+				delete this._hash[key];
 			},
 			reset: function (namespace) {
 				for (var key in this._hash) {
@@ -184,50 +184,50 @@
 			check: function () {
 				return navigator.cookieEnabled;
 			},
-			set: function (name, value, options) {
+			set: function (key, value, options) {
 				if (!this.check())
-					throw 'SecurityError: cookies are disabled';
+					throw Error('cookies are disabled');
 				options = options || {};
-				if (!name)
-					return;
-				var cookie = name + '=' + value;
+				if (!key)
+					throw Error('invalid key');
+				var cookie = key + '=' + value;
+				// handle expiration days
 				if (options.expireDays) {
 					var date = new Date();
 					date.setTime(date.getTime() + (options.expireDays * 24 * 60 * 60 * 1000));
 					cookie += '; expires=' + date.toGMTString();
 				}
-				if (options.domain)
+				// handle domain
+				if (options.domain && options.domain !== document.domain) {
+					var _domain = options.domain.replace(/^\./, '');
+					if (document.domain.indexOf(_domain) === -1 || _domain.split('.').length <= 1)
+						throw Error('invalid domain');
 					cookie += '; domain=' + options.domain;
+				}
 				document.cookie = cookie + '; path=/';
 			},
-			get: function (name) {
+			get: function (key) {
 				if (!this.check())
-					throw 'SecurityError: cookies are disabled';
+					throw Error('cookies are disabled');
 				var cookies = document.cookie ? document.cookie.split(';') : [];
-				for (var i = 0, cookie; i < cookies.length; i++) {
+				// retrieve last updated cookie first
+				for (var i = cookies.length - 1, cookie; i >= 0; i--) {
 					cookie = cookies[i].replace(/^\s*/, '');
-					if (cookie.indexOf(name + '=') === 0)
-						return cookie.substring(name.length + 1, cookie.length);
+					if (cookie.indexOf(key + '=') === 0)
+						return cookie.substring(key.length + 1, cookie.length);
 				}
 				return null;
 			},
-			remove: function (name) {
-				if (!this.check())
-					throw 'SecurityError: cookies are disabled';
-				if (!name)
-					return;
+			remove: function (key) {
 				// remove cookie from main domain
-				this.set(name, '', { expireDays: -1 });
-
+				this.set(key, '', { expireDays: -1 });
 				// remove cookie from upper domains
 				var domainParts = document.domain.split('.');
-				for (var i = domainParts.length - 1; i > 0; i--) {
-					this.set(name, '', { expireDays: -1, domain: '.' + domainParts.slice(- i).join('.') });
+				for (var i = domainParts.length; i >= 0; i--) {
+					this.set(key, '', { expireDays: -1, domain: '.' + domainParts.slice(- i).join('.') });
 				}
 			},
 			reset: function (namespace) {
-				if (!this.check())
-					throw 'SecurityError: cookies are disabled';
 				var cookies = document.cookie ? document.cookie.split(';') : [];
 				for (var i = 0, cookie, key; i < cookies.length; i++) {
 					cookie = cookies[i].replace(/^\s*/, '');
@@ -238,7 +238,7 @@
 			},
 			keys: function (namespace) {
 				if (!this.check())
-					throw 'SecurityError: cookies are disabled';
+					throw Error('cookies are disabled');
 				var keys = [],
 					cookies = document.cookie ? document.cookie.split(';') : [];
 				for (var i = 0, cookie, key; i < cookies.length; i++) {
@@ -267,48 +267,56 @@
 					return _storages[storage].check();
 				return false;
 			},
-			set: function (name, value, options) {
+			set: function (key, value, options) {
 				options = Basil.utils.extend({}, this.options, options);
-				if (!(name = _toStoredKey(options.namespace, name)))
-					return;
-				value = _toStoredValue(value);
-				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
-					_storages[storage].set(name, value, options);
+				if (!(key = _toStoredKey(options.namespace, key)))
+					return false;
+				value = options.raw === true ? value : _toStoredValue(value);
+				var where = null;
+				// try to set key/value in first available storage
+				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage, index) {
+					_storages[storage].set(key, value, options);
+					where = storage;
 					return false; // break;
-				}, function (storage, index, error) {
-					if (this.support(storage))
-						_storages[storage].remove(name);
-				}, this);
+				}, null, this);
+				if (!where) {
+					// key has not been set anywhere
+					return false;
+				}
+				// remove key from all other storages
+				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage, index) {
+					if (storage !== where)
+						_storages[storage].remove(key);
+				}, null, this);
+				return true;
 			},
-			get: function (name, options) {
+			get: function (key, options) {
 				options = Basil.utils.extend({}, this.options, options);
-				if (!(name = _toStoredKey(options.namespace, name)))
+				if (!(key = _toStoredKey(options.namespace, key)))
 					return null;
 				var value = null;
-				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
+				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage, index) {
 					if (value !== null)
-						return false; // break
-					if (this.support(storage))
-						value = _fromStoredValue(_storages[storage].get(name, options));
+						return false; // break if a value has already been found.
+					value = _storages[storage].get(key, options) || null;
+					value = options.raw === true ? value : _fromStoredValue(value);
 				}, function (storage, index, error) {
-					value = _storages[storage].get(name, options) || null;
+					value = null;
 				}, this);
 				return value;
 			},
-			remove: function (name, options) {
+			remove: function (key, options) {
 				options = Basil.utils.extend({}, this.options, options);
-				if (!(name = _toStoredKey(options.namespace, name)))
-					return null;
+				if (!(key = _toStoredKey(options.namespace, key)))
+					return;
 				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
-					if (this.support(storage))
-						_storages[storage].remove(name);
+					_storages[storage].remove(key);
 				}, null, this);
 			},
 			reset: function (options) {
 				options = Basil.utils.extend({}, this.options, options);
 				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
-					if (this.support(storage))
-						_storages[storage].reset(options.namespace);
+					_storages[storage].reset(options.namespace);
 				}, null, this);
 			},
 			keys: function (options) {
@@ -322,22 +330,21 @@
 				options = Basil.utils.extend({}, this.options, options);
 				var map = {};
 				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
-					if (!this.support(storage))
-						return true; // continue
 					Basil.utils.each(_storages[storage].keys(options.namespace), function (key) {
 						map[key] = Basil.utils.isArray(map[key]) ? map[key] : [];
 						map[key].push(storage);
 					}, this);
 				}, null, this);
 				return map;
-			},
-			// Access to native storages, without namespace or basil value decoration
-			memory: _storages.memory,
-			cookie: _storages.cookie,
-			localStorage: _storages.local,
-			sessionStorage: _storages.session
+			}
 		};
 	};
+
+	// Access to native storages, without namespace or basil value decoration
+	Basil.memory = new Basil.Storage().init({ storages: 'memory', namespace: null, raw: true });
+	Basil.cookie = new Basil.Storage().init({ storages: 'cookie', namespace: null, raw: true });
+	Basil.localStorage = new Basil.Storage().init({ storages: 'local', namespace: null, raw: true });
+	Basil.sessionStorage = new Basil.Storage().init({ storages: 'session', namespace: null, raw: true });
 
 	// browser export
 	window.Basil = Basil;

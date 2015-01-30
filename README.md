@@ -4,6 +4,17 @@ The missing Javascript smart persistence layer.
 Unified localstorage, cookie and session storage JavaScript API.
 
 
+## Philosophy
+
+Basil aims to ease the frontend storage management for developpers. It strive
+to be bulletproof and handle for you disabled cookies, full localStorage,
+unwanted native storage exceptions..
+
+When you'll try to store something, basil will automaticall seek through all
+the available storages and find the best suited one to store your value. It
+also handle for you the storage of complex javascript objects using json.
+
+
 ## Basic Usage
 
 ```javascript
@@ -19,9 +30,8 @@ basil.remove('foo'); // remove 'foo' value
 
 // advanced methods
 basil.check('local'); // boolean. Test if localStorage is available
-basil.reset(); // reset all stored values under namespace for current storage
+basil.reset(); // reset all stored values under namespace
 ```
-
 
 ## Advanced Usage
 
@@ -34,34 +44,41 @@ basil = new window.Basil(options);
 // set 'bar' value under 'foo' key in localStorage
 basil.set('foo', 'bar', { 'storages': ['local'] });
 
-// set 'bar' value under 'foo' key in localStorage AND cookie
-basil.set('foo', 'bar', { 'storages': ['local', 'cookie'] });
+// set 'bar' value under 'foo' key.
+// try first to store it into cookies and if not possible into localStorage
+basil.set('foo', 'quux', { 'storages': ['cookie', 'local'] });
 
 // set 'xyz' value under 'abc' key in memory
 basil.set('abc', 'xyz', { 'storages': ['memory'] });
+
+// set value without JSON encoding
+basil.set('foo', '{ "bar": "baz" }', { raw: true }); // will save { "bar": "baz" } as string
 
 // retrieve keys
 basil.keys(); // returns ['foo', 'abc']
 basic.keys({ 'storages': ['memory'] }); // returns ['abc']
 
-// retrive keys map
+// retrieve keys map
 basil.keysMap(); // returns { 'foo': ['local', 'cookie'], 'abc': ['memory'] }
 basic.keysMap({ 'storages': ['memory'] }); // returns { 'abc': ['memory'] }
+```
 
+### Native storages
+```
 // Access native storages
 // With basil API, but without namespace nor JSON parsing for values
 
 // cookies
-basil.cookie.get(key);
-basil.cookie.set(key, value, { 'expireDays': days, 'domain': 'mydomain.com' });
+Basil.cookie.get(key);
+Basil.cookie.set(key, value, { 'expireDays': days, 'domain': 'mydomain.com' });
 
 // localStorage
-basil.localStorage.get(key);
-basil.localStorage.set(key, value);
+Basil.localStorage.get(key);
+Basil.localStorage.set(key, value);
 
 // sessionStorage
-basil.sessionStorage.get(key);
-basil.sessionStorage.set(key, value);
+Basil.sessionStorage.get(key);
+Basil.sessionStorage.set(key, value);
 ```
 
 ### Namespaces
@@ -110,10 +127,6 @@ options = {
   // storages. Specify all Basil supported storages and priority order
   // default: `['local', 'cookie', 'session', 'memory']`
   storages: ['cookie', 'local']
-
-  // storage. Specify the default storage to use
-  // default: detect best available storage among the supported ones
-  storage: 'cookie'
 
   // expireDays. Default number of days before cookies expiration
   // default: 365

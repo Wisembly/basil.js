@@ -70,7 +70,7 @@ basic.keysMap({ 'storages': ['memory'] }); // returns { 'abc': ['memory'] }
 
 // cookies
 Basil.cookie.get(key);
-Basil.cookie.set(key, value, { 'expireDays': days, 'domain': 'mydomain.com' });
+Basil.cookie.set(key, value, { 'expireDays': days, 'domain': 'mydomain.com', 'secure': true });
 
 // localStorage
 Basil.localStorage.get(key);

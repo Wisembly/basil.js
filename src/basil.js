@@ -5,7 +5,7 @@
 	};
 
 	// Version
-	Basil.version = '0.4.0';
+	Basil.version = '0.4.1';
 
 	// Utils
 	Basil.utils = {

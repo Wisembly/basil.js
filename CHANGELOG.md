@@ -1,6 +1,10 @@
 # Basil changelog
 
-## 4.0.0
+## 0.4.1
+
+  - Added HTTPS cookie option (#27)
+
+## 0.4.0
 
   - Updated README
   - Added `keys()` and `keysMap()` methods (#24)

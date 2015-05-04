@@ -5,7 +5,7 @@
 	};
 
 	// Version
-	Basil.version = '0.4.0';
+	Basil.version = '0.4.1';
 
 	// Utils
 	Basil.utils = {
@@ -203,6 +203,10 @@
 					if (document.domain.indexOf(_domain) === -1 || _domain.split('.').length <= 1)
 						throw Error('invalid domain');
 					cookie += '; domain=' + options.domain;
+				}
+				// handle secure
+				if (options.secure === true) {
+					cookie =+ '; secure';
 				}
 				document.cookie = cookie + '; path=/';
 			},

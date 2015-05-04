@@ -204,6 +204,10 @@
 						throw Error('invalid domain');
 					cookie += '; domain=' + options.domain;
 				}
+				// handle secure
+				if (options.secure === true) {
+					cookie =+ '; secure';
+				}
 				document.cookie = cookie + '; path=/';
 			},
 			get: function (key) {

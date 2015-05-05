@@ -206,7 +206,7 @@
 				}
 				// handle secure
 				if (options.secure === true) {
-					cookie =+ '; secure';
+					cookie += '; secure';
 				}
 				document.cookie = cookie + '; path=/';
 			},

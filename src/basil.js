@@ -190,7 +190,7 @@
 				options = options || {};
 				if (!key)
 					throw Error('invalid key');
-				var cookie = key + '=' + value;
+				var cookie = key + '=' + encodeURIComponent(value);
 				// handle expiration days
 				if (options.expireDays) {
 					var date = new Date();
@@ -217,8 +217,10 @@
 				// retrieve last updated cookie first
 				for (var i = cookies.length - 1, cookie; i >= 0; i--) {
 					cookie = cookies[i].replace(/^\s*/, '');
-					if (cookie.indexOf(key + '=') === 0)
-						return cookie.substring(key.length + 1, cookie.length);
+					if (cookie.indexOf(key + '=') === 0){
+						var value = cookie.substring(key.length + 1, cookie.length);
+						return decodeURIComponent(value);
+					}
 				}
 				return null;
 			},

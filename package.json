@@ -7,6 +7,7 @@
         "test-all": "npm run-script test && npm run-script test-plugins",
         "build": "node node_modules/gulp/bin/gulp.js"
     },
+    "main": "build/basil.js",
     "dependencies": {},
     "devDependencies": {
         "karma": "*",

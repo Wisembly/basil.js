@@ -6,13 +6,13 @@ Unified localstorage, cookie and session storage JavaScript API.
 
 ## Philosophy
 
-Basil aims to ease the frontend storage management for developpers. It strive
-to be bulletproof and handle for you disabled cookies, full localStorage,
+Basil aims to ease the frontend storage management for developers. It strives
+to be bulletproof and handle disabled cookies, full localStorage and other
 unwanted native storage exceptions..
 
-When you'll try to store something, basil will automaticall seek through all
-the available storages and find the best suited one to store your value. It
-also handle for you the storage of complex javascript objects using json.
+When you try to store something, basil will automatically look through all
+the available storage mechanisms and find the best suited one to store your value. It
+also handles storage of complex javascript objects using json.
 
 
 ## Basic Usage

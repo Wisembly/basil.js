@@ -145,6 +145,17 @@
 			});
 		});
 
+		describe('cookie storage', function() {
+			it('can set and get keys with special characters', function() {
+				Basil.cookie.set('hello;world', 42);
+				expect(Basil.cookie.get('hello;world')).to.eql(42);
+			});
+			it('can set and get values with special characters', function() {
+				Basil.cookie.set('helloworld', 'test;one,two three');
+				expect(Basil.cookie.get('helloworld')).to.eql('test;one,two three');
+			});
+		});
+
 		if (window.Basil.localStorage.check()) {
 			describe('localStorage', function () {
 				var _engine = {

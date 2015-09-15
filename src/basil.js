@@ -190,7 +190,7 @@
 				options = options || {};
 				if (!key)
 					throw Error('invalid key');
-				var cookie = key + '=' + value;
+				var cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value);
 				// handle expiration days
 				if (options.expireDays) {
 					var date = new Date();
@@ -213,12 +213,13 @@
 			get: function (key) {
 				if (!this.check())
 					throw Error('cookies are disabled');
+				var encodedKey = encodeURIComponent(key);
 				var cookies = document.cookie ? document.cookie.split(';') : [];
 				// retrieve last updated cookie first
 				for (var i = cookies.length - 1, cookie; i >= 0; i--) {
 					cookie = cookies[i].replace(/^\s*/, '');
-					if (cookie.indexOf(key + '=') === 0)
-						return cookie.substring(key.length + 1, cookie.length);
+					if (cookie.indexOf(encodedKey + '=') === 0)
+						return decodeURIComponent(cookie.substring(encodedKey.length + 1, cookie.length));
 				}
 				return null;
 			},
@@ -247,7 +248,7 @@
 					cookies = document.cookie ? document.cookie.split(';') : [];
 				for (var i = 0, cookie, key; i < cookies.length; i++) {
 					cookie = cookies[i].replace(/^\s*/, '');
-					key = cookie.substr(0, cookie.indexOf('='));
+					key = decodeURIComponent(cookie.substr(0, cookie.indexOf('=')));
 					if (!namespace || key.indexOf(namespace) === 0)
 						keys.push(_toKeyName(namespace, key));
 				}

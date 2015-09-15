@@ -1,5 +1,9 @@
 # Basil changelog
 
+## 0.4.2
+
+  - Encode and decode cookie value on set and get (#30)
+
 ## 0.4.1
 
   - Added HTTPS cookie option (#27)

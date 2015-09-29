@@ -2,7 +2,7 @@
 
 ## 0.4.2
 
-  - Encode and decode cookie value on set and get (#30)
+  - [BC Break] Encode and decode cookie value on set and get (#30, #35)
 
 ## 0.4.1
 

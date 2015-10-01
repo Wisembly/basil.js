@@ -80,13 +80,13 @@
 				if (Basil.utils.isString(path) && path.length)
 					path = [path];
 				if (Basil.utils.isArray(path) && path.length)
-					key = path.join(':');
-				return key && namespace ? namespace + ':' + key : key;
+					key = path.join('.');
+				return key && namespace ? namespace + '.' + key : key;
 			},
 			_toKeyName = function (namespace, key) {
 				if (!namespace)
 					return key;
-				return key.replace(new RegExp('^' + namespace + ':'), '');
+				return key.replace(new RegExp('^' + namespace + '.'), '');
 			},
 			_toStoredValue = function (value) {
 				return JSON.stringify(value);

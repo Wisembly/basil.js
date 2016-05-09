@@ -45,7 +45,7 @@
 		}
 	};
   	// Add some isType methods: isArguments, isBoolean, isFunction, isString, isArray, isNumber, isDate, isRegExp.
-	var types = ['Arguments', 'Boolean', 'Function', 'String', 'Array', 'Number', 'Date', 'RegExp']
+	var types = ['Arguments', 'Boolean', 'Function', 'String', 'Array', 'Number', 'Date', 'RegExp'];
 	for (var i = 0; i < types.length; i++) {
 		Basil.utils['is' + types[i]] = (function (type) {
 			return function (obj) {
@@ -351,9 +351,6 @@
 	Basil.localStorage = new Basil.Storage().init({ storages: 'local', namespace: null, raw: true });
 	Basil.sessionStorage = new Basil.Storage().init({ storages: 'session', namespace: null, raw: true });
 
-	// browser export
-	window.Basil = Basil;
-
 	// AMD export
 	if (typeof define === 'function' && define.amd) {
 		define(function() {
@@ -362,6 +359,9 @@
 	// commonjs export
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = Basil;
+	// browser export
+	} else {
+		window.Basil = Basil;
 	}
 
 })();

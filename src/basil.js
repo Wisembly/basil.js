@@ -5,7 +5,7 @@
 	};
 
 	// Version
-	Basil.version = '0.4.2';
+	Basil.version = '0.4.4';
 
 	// Utils
 	Basil.utils = {
@@ -182,7 +182,15 @@
 		// cookie storage
 		_storages.cookie = {
 			check: function () {
-				return navigator.cookieEnabled;
+				if (!navigator.cookieEnabled)
+					return false;
+				if (window.self !== window.top) {
+					// we need to check third-party cookies;
+					var cookie = 'thirdparty.check=' + Math.round(Math.random() * 1000);
+					document.cookie = cookie + '; path=/';
+					return document.cookie.indexOf(cookie) !== -1;
+				}
+				return true;
 			},
 			set: function (key, value, options) {
 				if (!this.check())

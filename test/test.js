@@ -105,6 +105,62 @@
 				}
 				basil.reset();
 			});
+			it('should be able to define a key from an array of string', function () {
+				var basil = new window.Basil();
+				basil.set(['hello', 'world'], 'bar');
+				expect(basil.get(['hello', 'world'])).to.eql('bar');
+
+				basil.set(['foo', '', 'bar'], 'baz');
+				expect(basil.get('foo.bar')).to.eql('baz');
+
+				basil.remove(['foo', 'bar']);
+				expect(basil.get('foo.bar')).to.be(null);
+
+				basil.reset();
+			});
+			it('should be able to define a key from a mixed array', function () {
+				var basil = new window.Basil();
+				basil.set(['hello', 42, 'world', false], 'foobar');
+				expect(basil.get(['hello', 42, 'world', false])).to.eql('foobar');
+
+				basil.set(['foo', null, 'bar', '', 18], 'quux');
+				expect(basil.get('foo.bar.18')).to.eql('quux');
+
+				basil.remove(['foo', null, 'bar', '', 18], 'quux');
+				expect(basil.get('foo.bar.18')).to.be(null);
+
+				basil.reset();
+			});
+			it('should be able to define a key from a number', function () {
+				var basil = new window.Basil();
+				basil.set(42, 'foo');
+				expect(basil.get(42)).to.eql('foo');
+
+				basil.remove(42);
+				expect(basil.get(42)).to.be(null);
+
+				basil.set(1234, 'hello world');
+				expect(basil.get('1234')).to.eql('hello world');
+
+				basil.reset();
+			});
+			it('should be able to define a key from a boolean', function () {
+				var basil = new window.Basil();
+
+				basil.set(true, 'bar');
+				expect(basil.get(true)).to.eql('bar');
+
+				basil.remove(true);
+				expect(basil.get(true)).to.be(null);
+
+				basil.set(false, 'baz');
+				expect(basil.get('false')).to.eql('baz');
+
+				basil.remove('false');
+				expect(basil.get(false)).to.be(null);
+
+				basil.reset();
+			});
 			it('should be able to get all the keys', function() {
 				var basil = new window.Basil();
 				basil.set('foo', 'i am local', { storages: ['local'] });

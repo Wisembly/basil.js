@@ -50,7 +50,7 @@
 		}
 	};
   	// Add some isType methods: isArguments, isBoolean, isFunction, isString, isArray, isNumber, isDate, isRegExp, isUndefined, isNull.
-	var types = ['Arguments', 'Boolean', 'Function', 'String', 'Array', 'Number', 'Date', 'RegExp', 'Undefined', 'Null']
+	var types = ['Arguments', 'Boolean', 'Function', 'String', 'Array', 'Number', 'Date', 'RegExp', 'Undefined', 'Null'];
 	for (var i = 0; i < types.length; i++) {
 		Basil.utils['is' + types[i]] = (function (type) {
 			return function (obj) {

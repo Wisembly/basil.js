@@ -5,7 +5,7 @@
 	};
 
 	// Version
-	Basil.version = '0.4.2';
+	Basil.version = '0.4.4';
 
 	// Utils
 	Basil.utils = {
@@ -42,14 +42,19 @@
 		},
 		registerPlugin: function (methods) {
 			Basil.plugins = this.extend(methods, Basil.plugins);
+		},
+		getTypeOf: function (obj) {
+			if (typeof obj === 'undefined' || obj === null)
+				return '' + obj;
+			return Object.prototype.toString.call(obj).replace(/^\[object\s(.*)\]$/, function ($0, $1) { return $1.toLowerCase(); });
 		}
 	};
-  	// Add some isType methods: isArguments, isBoolean, isFunction, isString, isArray, isNumber, isDate, isRegExp.
-	var types = ['Arguments', 'Boolean', 'Function', 'String', 'Array', 'Number', 'Date', 'RegExp']
+  	// Add some isType methods: isArguments, isBoolean, isFunction, isString, isArray, isNumber, isDate, isRegExp, isUndefined, isNull.
+	var types = ['Arguments', 'Boolean', 'Function', 'String', 'Array', 'Number', 'Date', 'RegExp', 'Undefined', 'Null'];
 	for (var i = 0; i < types.length; i++) {
 		Basil.utils['is' + types[i]] = (function (type) {
 			return function (obj) {
-				return Object.prototype.toString.call(obj) === '[object ' + type + ']';
+				return Basil.utils.getTypeOf(obj) === type.toLowerCase();
 			};
 		})(types[i]);
 	}
@@ -70,6 +75,10 @@
 				.toString(36)
 				.substring(7),
 			_storages = {},
+			_isValidKey = function (key) {
+				var type = Basil.utils.getTypeOf(key);
+				return (type === 'string' && key) || type === 'number' || type === 'boolean';
+			},
 			_toStoragesArray = function (storages) {
 				if (Basil.utils.isArray(storages))
 					return storages;
@@ -77,14 +86,16 @@
 			},
 			_toStoredKey = function (namespace, path) {
 				var key = '';
-				if (Basil.utils.isString(path) && path.length)
-					path = [path];
-				if (Basil.utils.isArray(path) && path.length)
+				if (_isValidKey(path)) {
+					key += path;
+				} else if (Basil.utils.isArray(path)) {
+					path = Basil.utils.isFunction(path.filter) ? path.filter(_isValidKey) : path;
 					key = path.join('.');
-				return key && namespace ? namespace + '.' + key : key;
-			},
+				}
+				return key && _isValidKey(namespace) ? namespace + '.' + key : key;
+ 			},
 			_toKeyName = function (namespace, key) {
-				if (!namespace)
+				if (!_isValidKey(namespace))
 					return key;
 				return key.replace(new RegExp('^' + namespace + '.'), '');
 			},
@@ -182,7 +193,15 @@
 		// cookie storage
 		_storages.cookie = {
 			check: function () {
-				return navigator.cookieEnabled;
+				if (!navigator.cookieEnabled)
+					return false;
+				if (window.self !== window.top) {
+					// we need to check third-party cookies;
+					var cookie = 'thirdparty.check=' + Math.round(Math.random() * 1000);
+					document.cookie = cookie + '; path=/';
+					return document.cookie.indexOf(cookie) !== -1;
+				}
+				return true;
 			},
 			set: function (key, value, options) {
 				if (!this.check())

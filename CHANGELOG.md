@@ -1,5 +1,10 @@
 # Basil changelog
 
+## 0.4.4
+
+  - check third party cookies if not inside a top window
+  - support string, number, boolean or array as key
+
 ## 0.4.3
 
   - [BC Break] `_toStoredKey()` is now using '.' separator instead of ':' (#35)

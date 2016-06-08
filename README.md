@@ -56,11 +56,11 @@ basil.set('foo', '{ "bar": "baz" }', { raw: true }); // will save { "bar": "baz"
 
 // retrieve keys
 basil.keys(); // returns ['foo', 'abc']
-basic.keys({ 'storages': ['memory'] }); // returns ['abc']
+basil.keys({ 'storages': ['memory'] }); // returns ['abc']
 
 // retrieve keys map
 basil.keysMap(); // returns { 'foo': ['local', 'cookie'], 'abc': ['memory'] }
-basic.keysMap({ 'storages': ['memory'] }); // returns { 'abc': ['memory'] }
+basil.keysMap({ 'storages': ['memory'] }); // returns { 'abc': ['memory'] }
 ```
 
 ### Native storages

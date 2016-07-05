@@ -177,27 +177,27 @@
 			});
 			it('should be able to get all the keys of a given namespace', function() {
 				var basil = new window.Basil();
-				basil.options.namespace = 'first';
-				basil.set('foo', 'i am local with namespace `first`', { storages: ['local'] });
-				basil.set('foo', 'i am session with namespace `first`', { storages: ['session'] });
-				basil.options.namespace = 'second';
-				basil.set('bar', 'i am cookie and session with namespace `second`', { storages: ['cookie', 'session'] });
-				basil.set('baz', 'i am session with namespace `seconf`', { storages: ['session'] });
-				basil.options.namespace = 'third';
-				expect(basil.keys({ namespace: 'first' })).to.eql(['foo']);
-				expect(basil.keysMap({ namespace: 'first' })).to.eql({
+				basil.options.namespace = 'n1';
+				basil.set('foo', 'i am local with namespace `n1`', { storages: ['local'] });
+				basil.set('foo', 'i am session with namespace `n1`', { storages: ['session'] });
+				basil.options.namespace = 'n2';
+				basil.set('bar', 'i am cookie and session with namespace `n2`', { storages: ['cookie', 'session'] });
+				basil.set('baz', 'i am session with namespace `n2`', { storages: ['session'] });
+				basil.options.namespace = 'n3';
+				expect(basil.keys({ namespace: 'n1' })).to.eql(['foo']);
+				expect(basil.keysMap({ namespace: 'n1' })).to.eql({
 					'foo': ['local', 'session'],
 				});
-				expect(basil.keys({ namespace: 'second' })).to.eql(['bar', 'baz']);
-				expect(basil.keysMap({ namespace: 'second' })).to.eql({
+				expect(basil.keys({ namespace: 'n2' })).to.eql(['bar', 'baz']);
+				expect(basil.keysMap({ namespace: 'n2' })).to.eql({
 					'bar': ['cookie'],
 					'baz': ['session']
 				});
-				expect(basil.keys({ namespace: 'third' })).to.eql([]);
-				expect(basil.keysMap({ namespace: 'third' })).to.eql({});
-				basil.reset({ namespace: 'first' });
-				basil.reset({ namespace: 'second' });
-				basil.reset({ namespace: 'third' });
+				expect(basil.keys({ namespace: 'n3' })).to.eql([]);
+				expect(basil.keysMap({ namespace: 'n3' })).to.eql({});
+				basil.reset({ namespace: 'n1' });
+				basil.reset({ namespace: 'n2' });
+				basil.reset({ namespace: 'n3' });
 			});
 		});
 

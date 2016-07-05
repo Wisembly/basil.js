@@ -370,9 +370,6 @@
 	Basil.localStorage = new Basil.Storage().init({ storages: 'local', namespace: null, raw: true });
 	Basil.sessionStorage = new Basil.Storage().init({ storages: 'session', namespace: null, raw: true });
 
-	// browser export
-	window.Basil = Basil;
-
 	// AMD export
 	if (typeof define === 'function' && define.amd) {
 		define(function() {
@@ -381,6 +378,9 @@
 	// commonjs export
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = Basil;
+	// browser export
+	} else {
+		window.Basil = Basil;
 	}
 
 })();

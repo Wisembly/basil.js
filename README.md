@@ -48,6 +48,9 @@ basil.set('foo', 'bar', { 'storages': ['local'] });
 // try first to store it into cookies and if not possible into localStorage
 basil.set('foo', 'quux', { 'storages': ['cookie', 'local'] });
 
+// set a cookie with options.
+basil.set('def', 'uvw', { 'storages': ['cookie'], cookieSettings: { expireDays: 10, domain: 'mydomain.com', secure: true } });
+
 // set 'xyz' value under 'abc' key in memory
 basil.set('abc', 'xyz', { 'storages': ['memory'] });
 

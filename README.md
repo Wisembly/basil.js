@@ -143,6 +143,12 @@ options = {
 - Chrome 4+
 - Safari 4+
 
+### ES2015
+
+To use Basil as an ES2015 module, include an import statement in your project that points
+to the desired file. For example, `import Basil from 'basil.js/build/basil.es2015.min.js';`.
+Basil will not be a `window` object when using it in this way. Instead, it will be localized
+to the member namespace (e.g. "Basil").
 
 ## Plugins
 

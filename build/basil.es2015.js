@@ -1,4 +1,3 @@
-(function () {
 	// Basil
 	var Basil = function (options) {
 		return Basil.utils.extend({}, Basil.plugins, new Basil.Storage().init(options));
@@ -371,16 +370,4 @@
 	Basil.sessionStorage = new Basil.Storage().init({ storages: 'session', namespace: null, raw: true });
 
 	// browser export
-	window.Basil = Basil;
-
-	// AMD export
-	if (typeof define === 'function' && define.amd) {
-		define(function() {
-			return Basil;
-		});
-	// commonjs export
-	} else if (typeof module !== 'undefined' && module.exports) {
-		module.exports = Basil;
-	}
-
-})();
+	export default Basil;

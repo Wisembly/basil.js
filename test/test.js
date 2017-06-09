@@ -199,6 +199,33 @@
 				basil.reset({ namespace: 'n2' });
 				basil.reset({ namespace: 'n3' });
 			});
+			it('should be able to get all the keys of a given namespace and delimiter', function() {
+				var basil = new window.Basil();
+
+				basil.options.keyDelimiter = ':';
+
+				basil.options.namespace = 'n1';
+				basil.set('foo', 'i am local with namespace `n1`', { storages: ['local'] });
+				basil.set('foo', 'i am session with namespace `n1`', { storages: ['session'] });
+				basil.options.namespace = 'n2';
+				basil.set('bar', 'i am cookie and session with namespace `n2`', { storages: ['cookie', 'session'] });
+				basil.set('baz', 'i am session with namespace `n2`', { storages: ['session'] });
+				basil.options.namespace = 'n3';
+				expect(basil.keys({ namespace: 'n1' })).to.eql(['foo']);
+				expect(basil.keysMap({ namespace: 'n1' })).to.eql({
+					'foo': ['local', 'session'],
+				});
+				expect(basil.keys({ namespace: 'n2' })).to.eql(['bar', 'baz']);
+				expect(basil.keysMap({ namespace: 'n2' })).to.eql({
+					'bar': ['cookie'],
+					'baz': ['session']
+				});
+				expect(basil.keys({ namespace: 'n3' })).to.eql([]);
+				expect(basil.keysMap({ namespace: 'n3' })).to.eql({});
+				basil.reset({ namespace: 'n1' });
+				basil.reset({ namespace: 'n2' });
+				basil.reset({ namespace: 'n3' });
+			});
 		});
 
 		if (window.Basil.cookie.check()) {

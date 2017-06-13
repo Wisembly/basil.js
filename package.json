@@ -1,30 +1,30 @@
 {
-    "name": "basil.js",
-    "version": "0.4.4",
-    "scripts": {
-        "test": "node node_modules/karma/bin/karma start test/karma.config.js",
-        "test-plugins": "node node_modules/karma/bin/karma start test/karma.plugins.config.js",
-        "test-all": "npm run-script test && npm run-script test-plugins",
-        "build": "node node_modules/gulp/bin/gulp.js"
-    },
-    "main": "build/basil.js",
-    "dependencies": {},
-    "devDependencies": {
-        "karma": "*",
-        "karma-mocha": "*",
-        "karma-sinon-expect": "*",
-        "karma-chrome-launcher": "*",
-        "karma-firefox-launcher": "*",
-        "karma-safari-launcher": "*",
-        "karma-opera-launcher": "*",
-        "karma-ie-launcher": "*",
-        "karma-phantomjs-launcher": "*",
-        "gulp": "*",
-        "gulp-uglify": "*",
-        "gulp-rename": "*",
-        "mocha": "*"
-    },
-    "spm": {
-        "main": "src/basil.js"
-    }
+  "name": "basil.js",
+  "version": "0.4.5",
+  "scripts": {
+    "test": "node node_modules/karma/bin/karma start test/karma.config.js",
+    "test-plugins": "node node_modules/karma/bin/karma start test/karma.plugins.config.js",
+    "test-all": "npm run-script test && npm run-script test-plugins",
+    "build": "node node_modules/gulp/bin/gulp.js"
+  },
+  "main": "build/basil.js",
+  "dependencies": {},
+  "devDependencies": {
+    "karma": "*",
+    "karma-mocha": "*",
+    "karma-sinon-expect": "*",
+    "karma-chrome-launcher": "*",
+    "karma-firefox-launcher": "*",
+    "karma-safari-launcher": "*",
+    "karma-opera-launcher": "*",
+    "karma-ie-launcher": "*",
+    "karma-phantomjs-launcher": "*",
+    "gulp": "*",
+    "gulp-uglify": "*",
+    "gulp-rename": "*",
+    "mocha": "*"
+  },
+  "spm": {
+    "main": "src/basil.js"
+  }
 }

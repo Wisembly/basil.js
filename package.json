@@ -21,7 +21,8 @@
         "karma-phantomjs-launcher": "*",
         "gulp": "*",
         "gulp-uglify": "*",
-        "gulp-rename": "*"
+        "gulp-rename": "*",
+        "mocha": "*"
     },
     "spm": {
         "main": "src/basil.js"

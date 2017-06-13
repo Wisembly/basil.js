@@ -132,6 +132,10 @@ options = {
   // default: 365
   expireDays: 31
 
+  // keyDelimiter. The value used delimt the namespace from the key name
+  // default: '.'
+  keyDelimiter: '.'
+
 };
 ```
 

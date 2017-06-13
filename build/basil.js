@@ -5,7 +5,7 @@
 	};
 
 	// Version
-	Basil.version = '0.4.4';
+	Basil.version = '0.4.5';
 
 	// Utils
 	Basil.utils = {
@@ -66,7 +66,8 @@
 	Basil.options = Basil.utils.extend({
 		namespace: 'b45i1',
 		storages: ['local', 'cookie', 'session', 'memory'],
-		expireDays: 365
+		expireDays: 365,
+		keyDelimiter: '.'
 	}, window.Basil ? window.Basil.options : {});
 
 	// Storage
@@ -84,20 +85,20 @@
 					return storages;
 				return Basil.utils.isString(storages) ? [storages] : [];
 			},
-			_toStoredKey = function (namespace, path) {
+			_toStoredKey = function (namespace, path, delimiter) {
 				var key = '';
 				if (_isValidKey(path)) {
 					key += path;
 				} else if (Basil.utils.isArray(path)) {
 					path = Basil.utils.isFunction(path.filter) ? path.filter(_isValidKey) : path;
-					key = path.join('.');
+					key = path.join(delimiter);
 				}
-				return key && _isValidKey(namespace) ? namespace + '.' + key : key;
+				return key && _isValidKey(namespace) ? namespace + delimiter + key : key;
  			},
-			_toKeyName = function (namespace, key) {
+			_toKeyName = function (namespace, key, delimiter) {
 				if (!_isValidKey(namespace))
 					return key;
-				return key.replace(new RegExp('^' + namespace + '.'), '');
+				return key.replace(new RegExp('^' + namespace + delimiter), '');
 			},
 			_toStoredValue = function (value) {
 				return JSON.stringify(value);
@@ -138,12 +139,12 @@
 					}
 				}
 			},
-			keys: function (namespace) {
+			keys: function (namespace, delimiter) {
 				var keys = [];
 				for (var i = 0, key; i < window[this.engine].length; i++) {
 					key = window[this.engine].key(i);
 					if (!namespace || key.indexOf(namespace) === 0)
-						keys.push(_toKeyName(namespace, key));
+						keys.push(_toKeyName(namespace, key, delimiter));
 				}
 				return keys;
 			}
@@ -181,11 +182,11 @@
 						this.remove(key);
 				}
 			},
-			keys: function (namespace) {
+			keys: function (namespace, delimiter) {
 				var keys = [];
 				for (var key in this._hash)
 					if (!namespace || key.indexOf(namespace) === 0)
-						keys.push(_toKeyName(namespace, key));
+						keys.push(_toKeyName(namespace, key, delimiter));
 				return keys;
 			}
 		};
@@ -260,7 +261,7 @@
 						this.remove(key);
 				}
 			},
-			keys: function (namespace) {
+			keys: function (namespace, delimiter) {
 				if (!this.check())
 					throw Error('cookies are disabled');
 				var keys = [],
@@ -269,7 +270,7 @@
 					cookie = cookies[i].replace(/^\s*/, '');
 					key = decodeURIComponent(cookie.substr(0, cookie.indexOf('=')));
 					if (!namespace || key.indexOf(namespace) === 0)
-						keys.push(_toKeyName(namespace, key));
+						keys.push(_toKeyName(namespace, key, delimiter));
 				}
 				return keys;
 			}
@@ -293,7 +294,7 @@
 			},
 			set: function (key, value, options) {
 				options = Basil.utils.extend({}, this.options, options);
-				if (!(key = _toStoredKey(options.namespace, key)))
+				if (!(key = _toStoredKey(options.namespace, key, options.keyDelimiter)))
 					return false;
 				value = options.raw === true ? value : _toStoredValue(value);
 				var where = null;
@@ -316,7 +317,7 @@
 			},
 			get: function (key, options) {
 				options = Basil.utils.extend({}, this.options, options);
-				if (!(key = _toStoredKey(options.namespace, key)))
+				if (!(key = _toStoredKey(options.namespace, key, options.keyDelimiter)))
 					return null;
 				var value = null;
 				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage, index) {
@@ -331,7 +332,7 @@
 			},
 			remove: function (key, options) {
 				options = Basil.utils.extend({}, this.options, options);
-				if (!(key = _toStoredKey(options.namespace, key)))
+				if (!(key = _toStoredKey(options.namespace, key, options.keyDelimiter)))
 					return;
 				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
 					_storages[storage].remove(key);
@@ -354,7 +355,7 @@
 				options = Basil.utils.extend({}, this.options, options);
 				var map = {};
 				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
-					Basil.utils.each(_storages[storage].keys(options.namespace), function (key) {
+					Basil.utils.each(_storages[storage].keys(options.namespace, options.keyDelimiter), function (key) {
 						map[key] = Basil.utils.isArray(map[key]) ? map[key] : [];
 						map[key].push(storage);
 					}, this);

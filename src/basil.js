@@ -208,24 +208,25 @@
 				if (!this.check())
 					throw Error('cookies are disabled');
 				options = options || {};
+				options.cookieSettings = Basil.utils.extend({}, options.cookieSettings, options);
 				if (!key)
 					throw Error('invalid key');
 				var cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value);
 				// handle expiration days
-				if (options.expireDays) {
+				if (options.cookieSettings.expireDays) {
 					var date = new Date();
-					date.setTime(date.getTime() + (options.expireDays * 24 * 60 * 60 * 1000));
+					date.setTime(date.getTime() + (options.cookieSettings.expireDays * 24 * 60 * 60 * 1000));
 					cookie += '; expires=' + date.toGMTString();
 				}
 				// handle domain
-				if (options.domain && options.domain !== document.domain) {
-					var _domain = options.domain.replace(/^\./, '');
+				if (options.cookieSettings.domain && options.cookieSettings.domain !== document.domain) {
+					var _domain = options.cookieSettings.domain.replace(/^\./, '');
 					if (document.domain.indexOf(_domain) === -1 || _domain.split('.').length <= 1)
 						throw Error('invalid domain');
-					cookie += '; domain=' + options.domain;
+					cookie += '; domain=' + options.cookieSettings.domain;
 				}
 				// handle secure
-				if (options.secure === true) {
+				if (options.cookieSettings.secure === true) {
 					cookie += '; secure';
 				}
 				document.cookie = cookie + '; path=/';
@@ -371,8 +372,6 @@
 	Basil.localStorage = new Basil.Storage().init({ storages: 'local', namespace: null, raw: true });
 	Basil.sessionStorage = new Basil.Storage().init({ storages: 'session', namespace: null, raw: true });
 
-	// browser export
-	window.Basil = Basil;
 
 	// AMD export
 	if (typeof define === 'function' && define.amd) {
@@ -382,6 +381,9 @@
 	// commonjs export
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = Basil;
+	// browser export
+	} else {
+		window.Basil = Basil;
 	}
 
 })();

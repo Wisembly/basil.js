@@ -1,5 +1,9 @@
 # Basil changelog
 
+## 0.4.5
+
+  - Add options.keyDelimiter support
+
 ## 0.4.4
 
   - check third party cookies if not inside a top window

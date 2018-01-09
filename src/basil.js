@@ -228,6 +228,10 @@
 				if (options.secure === true) {
 					cookie += '; secure';
 				}
+				// handle httpOnly
+				if (options.httpOnly === true) {
+					cookie += '; httpOnly';
+				}
 				document.cookie = cookie + '; path=/';
 			},
 			get: function (key) {

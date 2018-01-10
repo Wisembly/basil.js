@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - "0.11"
+  - 6.10.0 # Latest Node LTS
 
 script:
   - npm run-script test-all

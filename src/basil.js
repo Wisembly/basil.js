@@ -226,7 +226,7 @@
 				}
 				// handle secure
 				if (options.secure === true) {
-					cookie += '; secure';
+					cookie += '; Secure';
 				}
 				document.cookie = cookie + '; path=/';
 			},

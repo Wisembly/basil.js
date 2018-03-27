@@ -193,7 +193,7 @@
 
 		// cookie storage
 		_storages.cookie = {
-			check: function () {
+			check: function (options) {
 				if (!navigator.cookieEnabled)
 					return false;
 				if (window.self !== window.top) {
@@ -201,6 +201,11 @@
 					var cookie = 'thirdparty.check=' + Math.round(Math.random() * 1000);
 					document.cookie = cookie + '; path=/';
 					return document.cookie.indexOf(cookie) !== -1;
+				}
+				// if cookie secure activated, ensure it works (not the case if we are in http only)
+				if (options && options.secure) {
+					this.set(_salt, _salt, options);
+					return this.get(_salt) === _salt;
 				}
 				return true;
 			},
@@ -289,7 +294,7 @@
 			},
 			check: function (storage) {
 				if (this.support(storage))
-					return _storages[storage].check();
+					return _storages[storage].check(this.options);
 				return false;
 			},
 			set: function (key, value, options) {

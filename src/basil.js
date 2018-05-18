@@ -205,7 +205,9 @@
 				// if cookie secure activated, ensure it works (not the case if we are in http only)
 				if (options && options.secure) {
 					this.set(_salt, _salt, options);
-					return this.get(_salt) === _salt;
+					var hasSecurelyPersited = this.get(_salt) === _salt;
+					this.remove(_salt);
+					return hasSecurelyPersited;
 				}
 				return true;
 			},

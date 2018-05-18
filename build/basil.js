@@ -204,10 +204,13 @@
 				}
 				// if cookie secure activated, ensure it works (not the case if we are in http only)
 				if (options && options.secure) {
-					this.set(_salt, _salt, options);
-					var hasSecurelyPersited = this.get(_salt) === _salt;
-					this.remove(_salt);
-					return hasSecurelyPersited;
+					try {
+						this.set(_salt, _salt, options);
+						var hasSecurelyPersited = this.get(_salt) === _salt;
+						this.remove(_salt);
+						return hasSecurelyPersited;
+					} catch (error) {}
+					return false;
 				}
 				return true;
 			},

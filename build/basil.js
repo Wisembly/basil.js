@@ -5,7 +5,7 @@
 	};
 
 	// Version
-	Basil.version = '0.4.5';
+	Basil.version = '0.4.9';
 
 	// Utils
 	Basil.utils = {
@@ -49,7 +49,8 @@
 			return Object.prototype.toString.call(obj).replace(/^\[object\s(.*)\]$/, function ($0, $1) { return $1.toLowerCase(); });
 		}
 	};
-  	// Add some isType methods: isArguments, isBoolean, isFunction, isString, isArray, isNumber, isDate, isRegExp, isUndefined, isNull.
+
+  // Add some isType methods: isArguments, isBoolean, isFunction, isString, isArray, isNumber, isDate, isRegExp, isUndefined, isNull.
 	var types = ['Arguments', 'Boolean', 'Function', 'String', 'Array', 'Number', 'Date', 'RegExp', 'Undefined', 'Null'];
 	for (var i = 0; i < types.length; i++) {
 		Basil.utils['is' + types[i]] = (function (type) {
@@ -209,8 +210,9 @@
 						var hasSecurelyPersited = this.get(_salt) === _salt;
 						this.remove(_salt);
 						return hasSecurelyPersited;
-					} catch (error) {}
-					return false;
+					} catch (error) {
+						return false;
+					}
 				}
 				return true;
 			},

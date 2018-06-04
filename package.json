@@ -1,6 +1,6 @@
 {
     "name": "basil.js",
-    "version": "0.4.5",
+    "version": "0.4.9",
     "scripts": {
         "test": "node node_modules/karma/bin/karma start test/karma.config.js",
         "test-plugins": "node node_modules/karma/bin/karma start test/karma.plugins.config.js",

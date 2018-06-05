@@ -260,7 +260,7 @@
 				this.set(key, '', { expireDays: -1 });
 				// remove cookie from upper domains
 				var domainParts = document.domain.split('.');
-				for (var i = domainParts.length; i >= 0; i--) {
+				for (var i = domainParts.length; i > 1; i--) {
 					this.set(key, '', { expireDays: -1, domain: '.' + domainParts.slice(- i).join('.') });
 				}
 			},

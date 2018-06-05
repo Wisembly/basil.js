@@ -50,7 +50,7 @@
 		}
 	};
 
-  // Add some isType methods: isArguments, isBoolean, isFunction, isString, isArray, isNumber, isDate, isRegExp, isUndefined, isNull.
+	// Add some isType methods: isArguments, isBoolean, isFunction, isString, isArray, isNumber, isDate, isRegExp, isUndefined, isNull.
 	var types = ['Arguments', 'Boolean', 'Function', 'String', 'Array', 'Number', 'Date', 'RegExp', 'Undefined', 'Null'];
 	for (var i = 0; i < types.length; i++) {
 		Basil.utils['is' + types[i]] = (function (type) {
@@ -260,7 +260,7 @@
 				this.set(key, '', { expireDays: -1 });
 				// remove cookie from upper domains
 				var domainParts = document.domain.split('.');
-				for (var i = domainParts.length; i >= 0; i--) {
+				for (var i = domainParts.length; i > 1; i--) {
 					this.set(key, '', { expireDays: -1, domain: '.' + domainParts.slice(- i).join('.') });
 				}
 			},

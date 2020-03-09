@@ -19,7 +19,7 @@
         "karma-opera-launcher": "*",
         "karma-ie-launcher": "*",
         "karma-phantomjs-launcher": "*",
-        "gulp": "*",
+        "gulp": "^4.0",
         "gulp-uglify": "*",
         "gulp-rename": "*",
         "mocha": "*"

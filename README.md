@@ -68,9 +68,14 @@ basil.keysMap({ 'storages': ['memory'] }); // returns { 'abc': ['memory'] }
 // Access native storages
 // With basil API, but without namespace nor JSON parsing for values
 
-// cookies
+// cookies has specific options
 Basil.cookie.get(key);
-Basil.cookie.set(key, value, { 'expireDays': days, 'domain': 'mydomain.com', 'secure': true });
+Basil.cookie.set(key, value, {
+  'expireDays': days,
+  'domain': 'mydomain.com',
+  'secure': true,
+  'sameSite': 'strict'
+});
 
 // localStorage
 Basil.localStorage.get(key);

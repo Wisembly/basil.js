@@ -125,7 +125,7 @@
 					iteration = 0,
 					removed = 0;
 
-				// iterate on whole list or stop if we found exactly the right count occurences
+				// iterate on whole list or stop if we found exactly the right count occurrences
 				while (iteration < length && (0 === count || (0 !== count && removed !== Math.abs(count)))) {
 
 					if (value === list[index]) {

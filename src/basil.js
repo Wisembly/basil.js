@@ -357,7 +357,8 @@
 			reset: function (options) {
 				options = Basil.utils.extend({}, this.options, options);
 				Basil.utils.tryEach(_toStoragesArray(options.storages), function (storage) {
-					_storages[storage].reset(options.namespace);
+					var namespaceStr = options.namespace+(options.keyDelimiter || '.'); 
+					_storages[storage].reset(namespaceStr);
 				}, null, this);
 			},
 			keys: function (options) {
